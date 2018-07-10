@@ -1,0 +1,4 @@
+sceneSetups:
+- path: Assets/now_with_fixation_point.unity
+  isLoaded: 1
+  isActive: 1
