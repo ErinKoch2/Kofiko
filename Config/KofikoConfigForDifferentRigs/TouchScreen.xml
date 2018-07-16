@@ -3,18 +3,19 @@
 
 <Config>
 
-<Directories
-   LogFolder = "C:\Shay\Data\Logs\"
-   PTB_Folder = "C:\Shay\Code\PublicLib\PTB\"
-> </Directories>
+  <Directories
+    LogFolder = "C:\Users\Trainer\Documents\GitHub\Kofiko\Data\Logs\"
+    PTB_Folder = "C:\toolbox\Psychtoolbox\"
+  > </Directories>
 
-<StimulusServer
-    SingleComputerMode = "1"
-    PTBScreen = "2"
-    Address = "127.0.0.1"
-    Port = "1502"
-    VisibleOffset = "40 15 -35 0"
-> </StimulusServer>
+  <StimulusServer
+      SingleComputerMode = "1"
+      PTBScreen = "2"
+      Address = "127.0.0.1"
+      Port = "12345"
+          VisibleOffset = "40 15 -35 0"
+  > </StimulusServer>
+
 
 <RemoteAccess
     Port = "2000"
@@ -97,8 +98,8 @@
 > </DAQ>
 
 <Sounds
-    AudioDeviceName = "ASIO4ALL v2"
-     	
+    AudioDeviceName = "Primary Sound Driver"
+
     TrialOnsetSoundFile = "beep-6.wav"
     TrialTimeoutSoundFile = "beep-10.wav"
     CorrectTrialSoundFile = "beep-8.wav"
@@ -127,9 +128,9 @@
         GUI = "fnParadigmTouchScreenGUI"
         Close = "fnParadigmTouchScreenClose"
         ParadigmSwitch = "fnParadigmTouchScreenParadigmSwitch"
-    
-        
-        
+
+
+
         Initial_JuiceTimeMS = "110"
         Initial_CorrectDistancePix = "75"
         Initial_InterTrialIntervalMinSec = "0.5"
@@ -139,12 +140,12 @@
         Initial_SpotRadius = "50"
         Initial_MonkeyStartTrial = "0"
         Initial_MultipleAttempts = "0"
-        
+
         Initial_PlayTrialStart = "0"
         Initial_PlayTrialTimeout = "0"
         Initial_PlayTrialCorrect = "1"
         Initial_PlayTrialIncorrect = "0"
-        
+
         TrialOnsetSoundFile = "beep-6.wav"
         TrialTimeoutSoundFile = "beep-10.wav"
         CorrectTrialSoundFile = "beep-8.wav"
@@ -162,28 +163,28 @@
         GUI = "fnParadigmTouchForceChoiceGUI"
         Close = "fnParadigmTouchForceChoiceClose"
         ParadigmSwitch = "fnParadigmTouchForceChoiceParadigmSwitch"
-        
-        
+
+
         Initial_PreCueFixationPeriodMS = "300"
         Initial_PreCueFixationSpotSize = "30"
         Initial_PreCueFixationSpotType = "Disc"
         Initial_PreCueFixationRegion = "50"
-        
+
         Initial_CuePeriodMS = "1000"
         Initial_CueMemoryPeriodMS = "1000"
         Initial_AbortTrialIfBreakFixationDuringCue = "1"
         Initial_OverlayPreCueFixation = "1"
-        
+
         Initial_MemoryPeriodMS = "1000"
-        
+
         Initial_InterTrialIntervalMinSec = "0"
         Initial_InterTrialIntervalMaxSec = "1"
-   
+
         Initial_TrialTimeoutMS = "10000"
         Initial_JuiceTimeMS = "50"
-        
-        
-        
+
+
+
         Initial_DefaultFolder = "\\touch\StimulusSet\"
         Initial_ExtinguishChoicesAfterSaccade = "1"
         Initial_ShowObjectsAfterSaccadeMS = "500"
@@ -204,7 +205,7 @@
         Initial_StairCaseStepPerc = "0"
         Initial_NoiseFile = "\\Kofiko-23B\StimulusSet\ClassificationImage\a2fRand_Pink_100x100x6000_Alpha1p2.mat"
   > </Paradigm>
-  
+
 </Paradigms>
 
 </Config>

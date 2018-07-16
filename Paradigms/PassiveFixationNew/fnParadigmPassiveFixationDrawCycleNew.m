@@ -30,11 +30,11 @@ if ~isempty(acInputFromKofiko)
             acFileNames = acInputFromKofiko{2};
             Screen(g_strctPTB.m_hWindow,'FillRect',0);
             fnFlipWrapper(g_strctPTB.m_hWindow);
-            
+
             fnStimulusServerClearTextureMemory();
             [g_strctDraw.m_ahHandles,g_strctDraw.m_a2iTextureSize,...
                 g_strctDraw.m_abIsMovie,g_strctDraw.m_aiApproxNumFrames,Dummy, g_strctDraw.m_acImages] = fnInitializeTexturesAux(acFileNames,false,true);
-            
+
             fnStimulusServerToKofikoParadigm('AllImagesLoaded');
             g_strctServerCycle.m_iMachineState = 0;
         case 'ShowTrial'
@@ -68,11 +68,14 @@ if ~isempty(acInputFromKofiko)
     end
 end;
 
+
 switch g_strctServerCycle.m_iMachineState
     case 0
         % Do nothing
     case 1
+        fnLog('case 1');
         fnDisplayMonocularImage();
+        fnSendUdpPacket();
     case 2
         fnWaitMonocularImageONPeriod();
     case 3
@@ -100,6 +103,8 @@ function fnDisplayMonocularImage()
 global g_strctDraw g_strctPTB g_strctServerCycle
 fCurrTime  = GetSecs();
 
+% important fix!! doesn't work otherwise!!!!
+g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix = 30;
 Screen('FillRect',g_strctPTB.m_hWindow, g_strctDraw.m_strctTrial.m_afBackgroundColor);
 aiFixationRect = [g_strctDraw.m_strctTrial.m_pt2iFixationSpot-g_strctDraw.m_strctTrial.m_fFixationSizePix,...
     g_strctDraw.m_strctTrial.m_pt2iFixationSpot+g_strctDraw.m_strctTrial.m_fFixationSizePix];
@@ -123,14 +128,15 @@ if g_strctDraw.m_strctTrial.m_bNoiseOverlay
         I(a2bMask) = a2fNoiseResamples(a2bMask)*255;
         a2fImage = I;
     end
-    
+
     hImageID = Screen('MakeTexture', g_strctPTB.m_hWindow,  a2fImage);
     Screen('DrawTexture', g_strctPTB.m_hWindow, hImageID,[],aiStimulusRect, g_strctDraw.m_strctTrial.m_fRotationAngle);
     Screen('Close',hImageID);
-    
+
 else
     Screen('DrawTexture', g_strctPTB.m_hWindow, g_strctDraw.m_ahHandles(hTexturePointer),[],aiStimulusRect, g_strctDraw.m_strctTrial.m_fRotationAngle);
 end
+
 
 if g_strctDraw.m_strctTrial.m_bShowPhotodiodeRect
     Screen('FillRect',g_strctPTB.m_hWindow,[255 255 255], ...
@@ -138,6 +144,7 @@ if g_strctDraw.m_strctTrial.m_bShowPhotodiodeRect
         g_strctPTB.m_aiRect(4)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix ...
         g_strctPTB.m_aiRect(3) g_strctPTB.m_aiRect(4)]);
 end
+
 
 % Draw Fixation spot
 Screen('FillArc',g_strctPTB.m_hWindow,[255 255 255], aiFixationRect,0,360);
@@ -156,20 +163,20 @@ if (fCurrTime - g_strctServerCycle.m_fLastFlipTime) > g_strctDraw.m_strctTrial.m
     % Turn stimulus off
     if g_strctDraw.m_strctTrial.m_fStimulusOFF_MS > 0
         Screen('FillRect',g_strctPTB.m_hWindow, g_strctDraw.m_strctTrial.m_afBackgroundColor);
-        
+
         aiFixationRect = [g_strctDraw.m_strctTrial.m_pt2iFixationSpot-g_strctDraw.m_strctTrial.m_fFixationSizePix,...
             g_strctDraw.m_strctTrial.m_pt2iFixationSpot+g_strctDraw.m_strctTrial.m_fFixationSizePix];
-        
+
         Screen('FillArc',g_strctPTB.m_hWindow,[255 255 255], aiFixationRect,0,360);
-        
+
         if g_strctDraw.m_strctTrial.m_bShowPhotodiodeRect
-            
+
             Screen('FillRect',g_strctPTB.m_hWindow,[0 0 0], ...
                 [g_strctPTB.m_aiRect(3)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix ...
                 g_strctPTB.m_aiRect(4)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix ...
                 g_strctPTB.m_aiRect(3) g_strctPTB.m_aiRect(4)]);
         end
-        
+
         g_strctServerCycle.m_fLastFlipTime = fnFlipWrapper( g_strctPTB.m_hWindow); % Block.
         fnStimulusServerToKofikoParadigm('FlipOFF',g_strctServerCycle.m_fLastFlipTime);
         g_strctServerCycle.m_iMachineState = 3;
@@ -260,14 +267,14 @@ if hFrameTexture == -1
     % End of movie
     % Flip background color and fixation spot for one frame to
     % clear the last frame
-    
+
     Screen('FillRect',g_strctPTB.m_hWindow, g_strctDraw.m_strctTrial.m_afBackgroundColor);
     aiFixationRect = [g_strctDraw.m_strctTrial.m_pt2iFixationSpot-g_strctDraw.m_strctTrial.m_fFixationSizePix,...
         g_strctDraw.m_strctTrial.m_pt2iFixationSpot+g_strctDraw.m_strctTrial.m_fFixationSizePix];
-    
+
     Screen('FillArc',g_strctPTB.m_hWindow,[255 255 255], aiFixationRect,0,360);
     fLastFlipTime = fnFlipWrapper(g_strctPTB.m_hWindow);  % Block (!)
-    
+
     g_strctDraw.m_a2fFrameFlipTS = g_strctDraw.m_a2fFrameFlipTS(:,1:g_strctDraw.m_iFrameCounter-1);
     fnStimulusServerToKofikoParadigm('TrialFinished',g_strctDraw.m_a2fFrameFlipTS,fLastFlipTime );
     g_strctServerCycle.m_iMachineState = 0;
@@ -277,12 +284,12 @@ else
 %         % This frame HAS been displayed yet.
 %         % Don't do anything. (it should still be on the screen...)
 %         Screen('Close', hFrameTexture);
-%         
+%
 %     else
         Screen('FillRect',g_strctPTB.m_hWindow, g_strctDraw.m_strctTrial.m_afBackgroundColor);
         aiFixationRect = [g_strctDraw.m_strctTrial.m_pt2iFixationSpot-g_strctDraw.m_strctTrial.m_fFixationSizePix,...
             g_strctDraw.m_strctTrial.m_pt2iFixationSpot+g_strctDraw.m_strctTrial.m_fFixationSizePix];
-        
+
         Screen('DrawTexture', g_strctPTB.m_hWindow, hFrameTexture,[],g_strctDraw.m_aiStimulusRect, g_strctDraw.m_strctTrial.m_fRotationAngle);
         Screen('FillArc',g_strctPTB.m_hWindow,[255 255 255], aiFixationRect,0,360);
 
@@ -292,11 +299,11 @@ else
                 g_strctPTB.m_aiRect(4)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix ...
                 g_strctPTB.m_aiRect(3) g_strctPTB.m_aiRect(4)]);
         end
-        
-        
+
+
         fLastFlipTime = fnFlipWrapper(g_strctPTB.m_hWindow, g_strctDraw.m_fMovieOnset+fTimeToFlip);  % Block (!)
         Screen('Close', hFrameTexture);
-        
+
         g_strctDraw.m_iFrameCounter = g_strctDraw.m_iFrameCounter + 1;
         g_strctDraw.m_a2fFrameFlipTS(1,g_strctDraw.m_iFrameCounter) = fTimeToFlip;   % Relative to movie onset
         g_strctDraw.m_a2fFrameFlipTS(2,g_strctDraw.m_iFrameCounter) = fLastFlipTime; % Actual Flip Time
@@ -330,13 +337,13 @@ if g_strctDraw.m_strctTrial.m_bNoiseOverlay
 
 for iBuffer=0:1
     Screen('SelectStereoDrawBuffer', g_strctPTB.m_hWindow,iBuffer); % Left Eye
-    
-    
+
+
     Screen('FillRect',g_strctPTB.m_hWindow, g_strctDraw.m_strctTrial.m_afBackgroundColor);
     Screen('SelectStereoDrawBuffer', g_strctPTB.m_hWindow,iBuffer); % Left Eye
-    
+
     Screen('SelectStereoDrawBuffer', g_strctPTB.m_hWindow,iBuffer); % Left Eye
-    
+
     Screen('DrawTexture', g_strctPTB.m_hWindow, g_strctDraw.m_ahHandles(ahTexturePointers(1+iBuffer)),[],a2iStimuliRect(iBuffer+1,:), g_strctDraw.m_strctTrial.m_fRotationAngle);
 
     if g_strctDraw.m_strctTrial.m_bShowPhotodiodeRect
@@ -350,17 +357,17 @@ for iBuffer=0:1
                 [g_strctPTB.m_aiRect(3)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix/2 ...
                 g_strctPTB.m_aiRect(4)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix-10 ...
                 g_strctPTB.m_aiRect(3) g_strctPTB.m_aiRect(4)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix]);
-            
+
         end
-        
+
         Screen('FillRect',g_strctPTB.m_hWindow,[255 255 255], ...
             [g_strctPTB.m_aiRect(3)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix ...
             g_strctPTB.m_aiRect(4)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix ...
             g_strctPTB.m_aiRect(3) g_strctPTB.m_aiRect(4)]);
     end
-    
+
     Screen('SelectStereoDrawBuffer', g_strctPTB.m_hWindow,iBuffer); % Left Eye
-    
+
     % Draw Fixation spot
     Screen('FillArc',g_strctPTB.m_hWindow,[255 255 255], aiFixationRect,0,360);
 end
@@ -377,19 +384,19 @@ fCurrTime  = GetSecs();
 if (fCurrTime - g_strctServerCycle.m_fLastFlipTime) > g_strctDraw.m_strctTrial.m_fStimulusON_MS/1e3 - (0.2 * (1/g_strctPTB.m_iRefreshRate) )
     % Turn stimulus off
     if g_strctDraw.m_strctTrial.m_fStimulusOFF_MS > 0
-        
+
         for iBufferIter=0:1
             Screen('SelectStereoDrawBuffer', g_strctPTB.m_hWindow,iBufferIter);
-            
+
             Screen('FillRect',g_strctPTB.m_hWindow, g_strctDraw.m_strctTrial.m_afBackgroundColor);
-            
+
             aiFixationRect = [g_strctDraw.m_strctTrial.m_pt2iFixationSpot-g_strctDraw.m_strctTrial.m_fFixationSizePix,...
                 g_strctDraw.m_strctTrial.m_pt2iFixationSpot+g_strctDraw.m_strctTrial.m_fFixationSizePix];
-            
+
             Screen('FillArc',g_strctPTB.m_hWindow,[255 255 255], aiFixationRect,0,360);
-            
+
             if g_strctDraw.m_strctTrial.m_bShowPhotodiodeRect
-                
+
                 Screen('FillRect',g_strctPTB.m_hWindow,[0 0 0], ...
                     [g_strctPTB.m_aiRect(3)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix ...
                     g_strctPTB.m_aiRect(4)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix ...
@@ -398,7 +405,7 @@ if (fCurrTime - g_strctServerCycle.m_fLastFlipTime) > g_strctDraw.m_strctTrial.m
         end
         g_strctServerCycle.m_fLastFlipTime = fnFlipWrapper( g_strctPTB.m_hWindow); % Block.
         fnStimulusServerToKofikoParadigm('FlipOFF',g_strctServerCycle.m_fLastFlipTime);
-        
+
         g_strctServerCycle.m_iMachineState = 8;
     else
         fnStimulusServerToKofikoParadigm('TrialFinished');
@@ -439,11 +446,11 @@ g_strctDraw.m_fMovieOnset = GetSecs();
 % Show first frame and go to state 10
 for iBufferIter=0:1
     Screen('SelectStereoDrawBuffer', g_strctPTB.m_hWindow,iBufferIter);
-    
+
     Screen('FillRect',g_strctPTB.m_hWindow, g_strctDraw.m_strctTrial.m_afBackgroundColor);
     aiFixationRect = [g_strctDraw.m_strctTrial.m_pt2iFixationSpot-g_strctDraw.m_strctTrial.m_fFixationSizePix,...
         g_strctDraw.m_strctTrial.m_pt2iFixationSpot+g_strctDraw.m_strctTrial.m_fFixationSizePix];
-    
+
     aiTextureSize = g_strctDraw.m_a2iTextureSize(:, ahTexturePointers(iBufferIter+1));
     g_strctDraw.m_a2iStimulusRect(iBufferIter+1,:) = fnComputeStimulusRect(g_strctDraw.m_strctTrial.m_fStimulusSizePix,aiTextureSize,g_strctDraw.m_strctTrial.m_pt2fStimulusPos);
     [hFrameTexture, fTimeToFlip] = Screen('GetMovieImage', g_strctPTB.m_hWindow, g_strctDraw.m_ahHandles(ahTexturePointers(iBufferIter+1)),1);
@@ -453,8 +460,8 @@ for iBufferIter=0:1
     Screen('Close', hFrameTexture);
     % Draw fixation spot
     Screen('FillArc',g_strctPTB.m_hWindow,[255 255 255], aiFixationRect,0,360);
-    
-    
+
+
   if g_strctDraw.m_strctTrial.m_bShowPhotodiodeRect
         if iBufferIter == 0
             Screen('FillRect',g_strctPTB.m_hWindow,[0 0 255], ...
@@ -466,20 +473,20 @@ for iBufferIter=0:1
                 [g_strctPTB.m_aiRect(3)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix/2 ...
                 g_strctPTB.m_aiRect(4)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix-10 ...
                 g_strctPTB.m_aiRect(3) g_strctPTB.m_aiRect(4)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix]);
-            
+
         end
-        
+
         Screen('FillRect',g_strctPTB.m_hWindow,[255 255 255], ...
             [g_strctPTB.m_aiRect(3)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix ...
             g_strctPTB.m_aiRect(4)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix ...
             g_strctPTB.m_aiRect(3) g_strctPTB.m_aiRect(4)]);
-    end    
-    
+    end
+
 end
 
 
 
-  
+
 
 
 
@@ -497,9 +504,6 @@ g_strctDraw.m_a2fFrameFlipTS(2,g_strctDraw.m_iFrameCounter) = fLastFlipTime; % A
 g_strctServerCycle.m_iMachineState = 10;
 return;
 
-
-
-
 function fnKeepPlayingStereoMovie()
 global g_strctDraw g_strctPTB g_strctServerCycle
 fCurrTime  = GetSecs();
@@ -508,9 +512,9 @@ fCurrTime  = GetSecs();
 ahTexturePointers = g_strctDraw.m_strctTrial.m_strctMedia.m_aiMediaToHandleIndexInBuffer;
 for iBufferIter=0:1
     Screen('SelectStereoDrawBuffer', g_strctPTB.m_hWindow,iBufferIter);
-    
+
     [hFrameTexture, fTimeToFlip] = Screen('GetMovieImage', g_strctPTB.m_hWindow, g_strctDraw.m_ahHandles(ahTexturePointers(iBufferIter+1)),1);
-    
+
     if hFrameTexture == -1
         % End of movie
         % Flip background color and fixation spot for one frame to
@@ -520,7 +524,7 @@ for iBufferIter=0:1
             Screen('FillRect',g_strctPTB.m_hWindow, g_strctDraw.m_strctTrial.m_afBackgroundColor);
             aiFixationRect = [g_strctDraw.m_strctTrial.m_pt2iFixationSpot-g_strctDraw.m_strctTrial.m_fFixationSizePix,...
                 g_strctDraw.m_strctTrial.m_pt2iFixationSpot+g_strctDraw.m_strctTrial.m_fFixationSizePix];
-            
+
             Screen('FillArc',g_strctPTB.m_hWindow,[255 255 255], aiFixationRect,0,360);
         end
         fLastFlipTime = fnFlipWrapper(g_strctPTB.m_hWindow);  % Block (!)
@@ -536,16 +540,16 @@ for iBufferIter=0:1
 %             Screen('Close', hFrameTexture);
 %         else
             Screen('SelectStereoDrawBuffer', g_strctPTB.m_hWindow,iBufferIter);
-  
+
             Screen('FillRect',g_strctPTB.m_hWindow, g_strctDraw.m_strctTrial.m_afBackgroundColor);
             aiFixationRect = [g_strctDraw.m_strctTrial.m_pt2iFixationSpot-g_strctDraw.m_strctTrial.m_fFixationSizePix,...
                 g_strctDraw.m_strctTrial.m_pt2iFixationSpot+g_strctDraw.m_strctTrial.m_fFixationSizePix];
-            
+
             Screen('DrawTexture', g_strctPTB.m_hWindow, hFrameTexture,[],g_strctDraw.m_a2iStimulusRect(iBufferIter+1,:), g_strctDraw.m_strctTrial.m_fRotationAngle);
             Screen('FillArc',g_strctPTB.m_hWindow,[255 255 255], aiFixationRect,0,360);
             Screen('Close', hFrameTexture);
-            
-            
+
+
   if g_strctDraw.m_strctTrial.m_bShowPhotodiodeRect
         if iBufferIter == 0
             Screen('FillRect',g_strctPTB.m_hWindow,[0 0 255], ...
@@ -557,16 +561,16 @@ for iBufferIter=0:1
                 [g_strctPTB.m_aiRect(3)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix/2 ...
                 g_strctPTB.m_aiRect(4)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix-10 ...
                 g_strctPTB.m_aiRect(3) g_strctPTB.m_aiRect(4)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix]);
-            
+
         end
-        
+
         Screen('FillRect',g_strctPTB.m_hWindow,[255 255 255], ...
             [g_strctPTB.m_aiRect(3)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix ...
             g_strctPTB.m_aiRect(4)-g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix ...
             g_strctPTB.m_aiRect(3) g_strctPTB.m_aiRect(4)]);
-    end            
-            
-            
+    end
+
+
 %         end
     end
 end
@@ -576,5 +580,27 @@ fLastFlipTime = fnFlipWrapper(g_strctPTB.m_hWindow, g_strctDraw.m_fMovieOnset+fT
 g_strctDraw.m_iFrameCounter = g_strctDraw.m_iFrameCounter + 1;
 g_strctDraw.m_a2fFrameFlipTS(1,g_strctDraw.m_iFrameCounter) = fTimeToFlip;   % Relative to movie onset
 g_strctDraw.m_a2fFrameFlipTS(2,g_strctDraw.m_iFrameCounter) = fLastFlipTime; % Actual Flip Time
+
+return;
+
+function fnSendUdpPacket()
+global g_strctDraw g_strctPTB g_strctServerCycle
+fCurrTime  = GetSecs();
+
+udp=pnet('udpsocket',1111);
+if udp~=-1,
+  fnLog('udp attempt');
+
+  try, % Failsafe
+      host = '127.0.0.1';
+      port = 12345;
+
+    pnet(udp,'write','This is test message number');              % Write to write buffer
+    pnet(udp,'writepacket',host,port);   % Send buffer as UDP packet
+  end
+  pnet(udp,'close');
+end
+ 
+
 
 return;

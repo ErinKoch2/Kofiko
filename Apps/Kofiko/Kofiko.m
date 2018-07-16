@@ -25,6 +25,10 @@ end;
 g_strctAppConfig.m_strctVersion = fnGetKofikoVersion();
 
 warning off
+% print( g_strctAppConfig.m_strctDirectories);
+% print(fieldnames(g_strctAppConfig.m_strctDirectories));
+
+
 fnAddPTBFolders(g_strctAppConfig.m_strctDirectories.m_strPTB_Folder);
 warning on
 try
