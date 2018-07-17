@@ -75,10 +75,11 @@ switch g_strctServerCycle.m_iMachineState
     case 1
         fnLog('case 1');
         fnDisplayMonocularImage();
-        fnSendUdpPacket();
+        fnSendUdpPacketStop();
     case 2
         fnWaitMonocularImageONPeriod();
     case 3
+        fnSendUdpPacketStart() ;
         fnWaitMonocularImageOFFPeriod();
     case 4
         fnDisplayMonocularMovie();
@@ -103,12 +104,14 @@ function fnDisplayMonocularImage()
 global g_strctDraw g_strctPTB g_strctServerCycle
 fCurrTime  = GetSecs();
 
-% important fix!! doesn't work otherwise!!!!
+% important fix!! doesn't work otherwise!!!! -mzhong
 g_strctDraw.m_strctTrial.m_iPhotoDiodeWindowPix = 30;
+
 Screen('FillRect',g_strctPTB.m_hWindow, g_strctDraw.m_strctTrial.m_afBackgroundColor);
 aiFixationRect = [g_strctDraw.m_strctTrial.m_pt2iFixationSpot-g_strctDraw.m_strctTrial.m_fFixationSizePix,...
     g_strctDraw.m_strctTrial.m_pt2iFixationSpot+g_strctDraw.m_strctTrial.m_fFixationSizePix];
 
+% fnLog(g_strctDraw.m_strctTrial.m_strctMedia.m_aiMediaToHandleIndexInBuffer(1));
 hTexturePointer = g_strctDraw.m_strctTrial.m_strctMedia.m_aiMediaToHandleIndexInBuffer(1);
 aiTextureSize = g_strctDraw.m_a2iTextureSize(:, hTexturePointer);
 aiStimulusRect = fnComputeStimulusRect(g_strctDraw.m_strctTrial.m_fStimulusSizePix,aiTextureSize, ...
@@ -583,24 +586,41 @@ g_strctDraw.m_a2fFrameFlipTS(2,g_strctDraw.m_iFrameCounter) = fLastFlipTime; % A
 
 return;
 
-function fnSendUdpPacket()
+function fnSendUdpPacketStart()
 global g_strctDraw g_strctPTB g_strctServerCycle
-fCurrTime  = GetSecs();
+    fCurrTime  = GetSecs();
 
-udp=pnet('udpsocket',1111);
-if udp~=-1,
-  fnLog('udp attempt');
+    udp=pnet('udpsocket',1111);
+    if udp~=-1,
+      fnLog('udp attempt');
 
-  try, % Failsafe
-      host = '127.0.0.1';
-      port = 12345;
+      try % Failsafe
+        host = '127.0.0.1';
+        port = 12345;
 
-    pnet(udp,'write','This is test message number');              % Write to write buffer
-    pnet(udp,'writepacket',host,port);   % Send buffer as UDP packet
-  end
-  pnet(udp,'close');
-end
- 
+        r = rand(4,1); 
+        pnet(udp,'write',sprintf('true,%f,%f,%f,%f', r(1),r(2),r(3),r(4)));              % Write to write buffer
+        pnet(udp,'writepacket',host,port);   % Send buffer as UDP packet
+      end
+      pnet(udp,'close');
+    end
+return;
 
+function fnSendUdpPacketStop() 
+global g_strctDraw g_strctPTB g_strctServerCycle
+    fCurrTime  = GetSecs();
+
+    udp=pnet('udpsocket',1111);
+    if udp~=-1,
+      fnLog('udp attempt');
+
+      try % Failsafe
+        host = '127.0.0.1';
+        port = 12345;
+        pnet(udp,'write','false,0.5,0.5,0.5,0.5');              % Write to write buffer
+        pnet(udp,'writepacket',host,port);   % Send buffer as UDP packet
+      end
+      pnet(udp,'close');
+    end
 
 return;
