@@ -24,10 +24,7 @@ end
 acInputFromKofiko = msrecv(g_strctNet.m_iCommSocket,g_strctConfig.m_strctStimulusServer.m_fNetworkCmdTimeout);
 if ~isempty(acInputFromKofiko)
     strCommand = acInputFromKofiko{1};
-    
-    % Screen('WindowToBack', g_strctConfig.m_strctStimulusServer.m_fPTBScreen);
-    % Screen('CloseAll');
-    
+
     switch strCommand
         case 'StartPTB'
             fnStartPTB();
@@ -104,17 +101,17 @@ return;
 
 function fnClearScreen()
 global g_strctPTB  g_strctConfig 
-    if g_strctPTB.m_bRunning && ~g_strctConfig.m_strctStimulusServer.m_fVirtualServer
-        if g_strctPTB.m_bInStereoMode
-            Screen('SelectStereoDrawBuffer', g_strctPTB.m_hWindow,0); % Left Eye
-            Screen(g_strctPTB.m_hWindow,'FillRect',0);
-            Screen('SelectStereoDrawBuffer', g_strctPTB.m_hWindow,1); % Right Eye
-            Screen(g_strctPTB.m_hWindow,'FillRect',0);
-        else
-            Screen(g_strctPTB.m_hWindow,'FillRect',0);
-        end
-        fnFlipWrapper(g_strctPTB.m_hWindow);
+if g_strctPTB.m_bRunning && ~g_strctConfig.m_strctStimulusServer.m_fVirtualServer
+    if g_strctPTB.m_bInStereoMode
+        Screen('SelectStereoDrawBuffer', g_strctPTB.m_hWindow,0); % Left Eye
+        Screen(g_strctPTB.m_hWindow,'FillRect',0);
+        Screen('SelectStereoDrawBuffer', g_strctPTB.m_hWindow,1); % Right Eye
+        Screen(g_strctPTB.m_hWindow,'FillRect',0);
+    else
+        Screen(g_strctPTB.m_hWindow,'FillRect',0);
     end
+    fnFlipWrapper(g_strctPTB.m_hWindow);
+end
 return;
 
 
@@ -123,8 +120,6 @@ global g_strctPTB g_strctConfig g_strctNet g_strctDraw
        iWindowSize = 400;
         iShift = 30;
 clear global g_strctDraw 
-
-
 if g_strctConfig.m_strctStimulusServer.m_fVirtualServer
     if g_strctConfig.m_strctStimulusServer.m_fDebugMode
         
@@ -194,9 +189,6 @@ else
         fnFlipWrapper(g_strctPTB.m_hWindow);
     end;
 end;
-
-
-
 g_strctPTB.m_bRunning = true;
 g_strctPTB.m_bRunningOnStimulusServer = true;
 if g_strctConfig.m_strctStimulusServer.m_fCaptureOtherScreens
