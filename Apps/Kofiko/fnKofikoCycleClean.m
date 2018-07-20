@@ -228,18 +228,18 @@ elseif strcmpi(g_strctAppConfig.m_strctDAQ.m_strAcqusitionCard,'arduino')
             g_strctEyeCalib.EyeRaw.TimeStamp(iLastEntry+1:iLastEntry+iNumPackets) = afTimeStamps;
             g_strctEyeCalib.EyeRaw.BufferIdx = iLastEntry+iNumPackets;
             
-        else
+        % else
             % lost sync with iscan or Iscan was disconnected.
-            if all(pktdata == 0)
+            % if all(pktdata == 0)
                 % Pause paradigm and show a message to user.
                 % Can we recover from this?
-                fnPauseParadigm();
-                fnParadigmToKofikoComm('DisplayMessage','Lost ISCAN Connection',20);
-                      afRAWEyeSig = g_strctEyeCalib.EyeRaw.Buffer(1,:,iLastEntry);
+                % fnPauseParadigm();
+                % fnParadigmToKofikoComm('DisplayMessage','Lost ISCAN Connection',20);
+                %      afRAWEyeSig = g_strctEyeCalib.EyeRaw.Buffer(1,:,iLastEntry);
   
-            else
-                assert(false); % lost sync with ISCAN
-            end
+            % else
+            %     assert(false); % lost sync with ISCAN
+        %    end
         end
     else
         % Packet not yet ready, use buffer....

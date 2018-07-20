@@ -10,29 +10,30 @@
 int HardwareTrigger0 = 0, HardwareTrigger1 = 0;
 
 void Trigger0() {
-   HardwareTrigger0 = 1;
+  HardwareTrigger0 = 1;
 }
 
 void Trigger1() {
-   HardwareTrigger1 = 1;
+  HardwareTrigger1 = 1;
 }
 
 void setup() {
-        Serial.begin(115200);     // opens serial port, sets data rate to 9600 bps
-        
+  Serial.begin(115200);     // opens serial port, sets data rate to 9600 bps
+  
   // set prescale to 16
   sbi(ADCSRA,ADPS2) ;
   cbi(ADCSRA,ADPS1) ;
   cbi(ADCSRA,ADPS0) ;
   
   // Set Interrupt trigger
+  attachInterrupt(0, Trigger0, RISING);
+  attachInterrupt(1, Trigger1, RISING);  
+
   pinMode(2, INPUT);
   digitalWrite(2, LOW); // Pin 
   pinMode(3, INPUT);  
   digitalWrite(3, LOW); // Pin   
   
-  attachInterrupt(0, Trigger0, RISING);
-  attachInterrupt(1, Trigger1, RISING);  
 }
 
 #define MAX_BUF_SIZE 100
@@ -43,12 +44,12 @@ char Command_Serial_Buf[MAX_BUF_SIZE];
 int bufindex = 0;
 
 class Pulse {
-  public:
-    Pulse();
-    void SetBit();
-    private:
-    
-    int bit;
+public:
+  Pulse();
+  void SetBit();
+private:
+  
+  int bit;
 };
 
 void fnParseBuffer(String InputStr)
@@ -57,14 +58,14 @@ void fnParseBuffer(String InputStr)
   int CmdStop = 0;
   for (int CmdStop=0;CmdStop<InputStr.length();CmdStop++) {
     if (InputStr[CmdStop] == 32)
-      break;
+    break;
   }
   Serial.println(CmdStop);
   String Cmd = InputStr.substring(CmdStop-1);
   Serial.println(Cmd);
-
+  
   if (Cmd.equals("SetBit")) {
-   Serial.println("Match!"); 
+    Serial.println("Match!"); 
   } else if  (Cmd.equals("Pulse")) {
     // Non Blocking pulse    
     int BitIndex = 0;
@@ -77,60 +78,60 @@ void fnParseBuffer(String InputStr)
     int BitIndex = 0;
     Serial.println("BitValue XX YY TT");
   }  else if  (Cmd.equals("GetAnalog")) {
-     // Single Read
+    // Single Read
     Serial.println("AnalogValue XX YY TT");
   } else if  (Cmd.equals("StartGetAnalog")) {
-     // Single Read
-     int Channel = 0;
-     int Freq = 0;
-     Serial.println("AnalogValue XX YY TT");
+    // Single Read
+    int Channel = 0;
+    int Freq = 0;
+    Serial.println("AnalogValue XX YY TT");
   }
   
 }
 
 void loop() {
-
-        if (Serial.available() > 0) {
-                // read the incoming byte:
-                char incomingByte = Serial.read();
-                if (incomingByte == 10)  {
-                  Command_Serial_Buf[bufindex] = 0;
-                  fnParseBuffer(String(Command_Serial_Buf));
-                  Serial.println(Command_Serial_Buf);
-                  bufindex = 0;
-                } else {
-                      Command_Serial_Buf[bufindex++] = incomingByte;
-                }
-                
-               
-        }  
+  
+  if (Serial.available() > 0) {
+    // read the incoming byte:
+    char incomingByte = Serial.read();
+    if (incomingByte == 10)  {
+      Command_Serial_Buf[bufindex] = 0;
+      fnParseBuffer(String(Command_Serial_Buf));
+      Serial.println(Command_Serial_Buf);
+      bufindex = 0;
+    } else {
+      Command_Serial_Buf[bufindex++] = incomingByte;
+    }
+    
+    
+  }  
   
   if (HardwareTrigger0) {
-      Serial.println("Trigger 0");
-      HardwareTrigger0 = 0;
+    Serial.println("Trigger 0");
+    HardwareTrigger0 = 0;
   }
   if (HardwareTrigger1) {
-      Serial.println("Trigger 1");
-      HardwareTrigger1 = 0;
+    Serial.println("Trigger 1");
+    HardwareTrigger1 = 0;
   }
   
   // Run Finit State Machine...
   
   cnt++;
-ts = micros();
-if (ts - prev_ts > 1000000) {
-Serial.println(cnt);
-cnt =0;
-prev_ts=ts;
-}
-
-for (int k=0;k<5;k++) {
-  int x = analogRead(k);
-}
-for (int k=0;k<13;k++) {
-  int x = digitalRead(k);
-}
-
-        // send data only when you receive data:
-
+  ts = micros();
+  if (ts - prev_ts > 1000000) {
+    Serial.println(cnt);
+    cnt =0;
+    prev_ts=ts;
+  }
+  
+  for (int k=0;k<5;k++) {
+    int x = analogRead(k);
+  }
+  for (int k=0;k<13;k++) {
+    int x = digitalRead(k);
+  }
+  
+  // send data only when you receive data:
+  
 }

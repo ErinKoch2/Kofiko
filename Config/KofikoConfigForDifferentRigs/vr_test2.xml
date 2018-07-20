@@ -9,10 +9,10 @@
     > </Directories>
 
     <StimulusServer
-        SingleComputerMode = "1"
+        SingleComputerMode = "0"
         PTBScreen = "2"
         Address = "127.0.0.1"
-        Port = "12345"
+        Port = "1501"
     > </StimulusServer>
 
     <RemoteAccess
