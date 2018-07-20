@@ -31,7 +31,7 @@ public class FOVE3DCursor : MonoBehaviour
 		}
 		else
 		{
-			transform.position = r.GetPoint(3.0f);
+			transform.position = r.GetPoint(30.0f);
 		}
 	}
 }
