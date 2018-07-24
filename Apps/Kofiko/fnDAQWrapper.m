@@ -140,6 +140,28 @@ elseif strcmp(g_strctAppConfig.m_strctDAQ.m_strAcqusitionCard,'redbox')
     Out = fnDAQRedBox(strCommand, varargin{:});
   end
   
+elseif strcmp(g_strctAppConfig.m_strctDAQ.m_strAcqusitionCard,'unity')
+  % hacked together unity daq ... 
+  fCurrTime = GetSecs();
+  switch strCommand
+    case 'Init'
+        Out=false; % no error
+    case 'StrobeWord'
+    case 'TTL'
+    case 'SetBit'
+    case 'GetAnalog'
+      x = 0;
+      y = 0;
+      aiRequiredValues = varargin{1};
+      Out = zeros(1,max(aiRequiredValues));
+      Out(aiRequiredValues == g_strctDAQParams.m_fEyePortX) = x/g_strctPTB.m_fScale;
+      Out(aiRequiredValues == g_strctDAQParams.m_fEyePortY) = y/g_strctPTB.m_fScale;% Simulate eye position using the mouse
+
+    otherwise
+        assert(false);
+    end
+  
+  
 end
 
 return;
