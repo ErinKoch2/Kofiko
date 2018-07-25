@@ -115,9 +115,10 @@ if g_strctAppConfig.m_strctStimulusServer.m_fSingleComputerMode
     g_strctStimulusServer.m_iSocket = [];
     g_strctStimulusServer.m_strIP = [];%g_strctAppConfig.m_strctStimulusServer.m_strAddress;
     g_strctStimulusServer.m_iPort = [];%g_strctAppConfig.m_strctStimulusServer.m_fPort;
-    [fWidth, fHeight] = Screen('WindowSize',g_strctAppConfig.m_strctStimulusServer.m_fPTBScreen);
-    g_strctStimulusServer.m_aiScreenSize = [0 0 fWidth, fHeight] + ...
-        g_strctAppConfig.m_strctStimulusServer.m_afVisibleOffset;
+    % [fWidth, fHeight] = Screen( 'WindowSize', g_strctAppConfig.m_strctStimulusServer.m_fPTBScreen);
+    % g_strctStimulusServer.m_aiScreenSize = [0 0 fWidth, fHeight] + ...
+    %     g_strctAppConfig.m_strctStimulusServer.m_afVisibleOffset;
+    g_strctStimulusServer.m_aiScreenSize = [0 0 1 1];
     g_strctStimulusServer.m_fRefreshRateHz = fRefreshRate;
     g_strctStimulusServer.m_fRefreshRateMS = 1/fRefreshRate*1000;
     g_strctStimulusServer.m_bConnected = true;
@@ -1344,9 +1345,9 @@ Screen('Flip',g_strctPTB.m_hWindow);
 if g_strctAppConfig.m_strctStimulusServer.m_fSingleComputerMode
     Screen('Preference', 'SkipSyncTests', 1);
     g_strctPTB.m_iRefreshRate=Screen('FrameRate', 0);
-    [g_strctStimulusServer.m_hWindow, g_strctStimulusServer.m_aiRect] = Screen(    'OpenWindow',g_strctAppConfig.m_strctStimulusServer.m_fPTBScreen,[0 0 0],[]);
-    Screen('Flip',g_strctStimulusServer.m_hWindow);
-    Screen(g_strctStimulusServer.m_hWindow,'BlendFunction',GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    %[g_strctStimulusServer.m_hWindow, g_strctStimulusServer.m_aiRect] = Screen(    'OpenWindow',g_strctAppConfig.m_strctStimulusServer.m_fPTBScreen,[0 0 0],[]);
+    %Screen('Flip',g_strctStimulusServer.m_hWindow);
+    %Screen(g_strctStimulusServer.m_hWindow,'BlendFunction',GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 end
 Screen(g_strctPTB.m_hWindow,'BlendFunction',GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

@@ -9,10 +9,11 @@
     > </Directories>
 
     <StimulusServer
-        SingleComputerMode = "0"
-        PTBScreen = "2"
+        SingleComputerMode = "1"
+        PTBScreen = "0"
         Address = "127.0.0.1"
         Port = "1501"
+        VisibleOffset = "40 15 -35 0" 
     > </StimulusServer>
 
     <RemoteAccess
@@ -30,10 +31,10 @@
     > </RealTimeStatisticsServer>
 
     <EyeCalib
-        CenterX = "2041"
-        CenterY = "2018"
-        ScaleX = "1.8"
-        ScaleY = "-2.7"
+        CenterX = "0"
+        CenterY = "0"
+        ScaleX = "0"
+        ScaleY = "0"
     > </EyeCalib>
 
     <VarSave
@@ -65,6 +66,9 @@
         MotionThreshold = "250000"
         PauseTaskAfterMotionSec = "0.1"
         MotionResumeTaskSec = "3"
+        PSTHStartAvgAfterOnsetMS = "50"
+        PSTHEndAvgAfterOnsetMS = "200"
+
 
     > </GUIParams>
 
@@ -96,18 +100,65 @@
     > </Sounds>
 
     <Paradigms>
+      <Paradigm Name = "Default"
+                Init = "fnParadigmDefaultInit"
+                Cycle = "fnParadigmDefaultCycle"
+                Draw = "fnParadigmDefaultDraw"
+                DrawCycle = "fnParadigmDefaultDrawCycle"
+                Callbacks = "fnParadigmDefaultCallbacks"
+                GUI = "fnParadigmDefaultGUI"
+                Close = "fnParadigmDefaultClose"
+                ParadigmSwitch = "fnParadigmDefaultParadigmSwitch"
+                StrobeCodes = "DefualtStrobeCodes.txt"
+      > </Paradigm>
+s
+      
+      <Paradigm Name = "Passive Fixation New"
+                Init = "fnParadigmPassiveFixationInitNew"
+                Cycle = "fnParadigmPassiveFixationCycleNew"
+                Draw = "fnParadigmPassiveFixationDrawNew"
+                DrawCycle = "fnParadigmPassiveFixationDrawCycleNew"
+                Callbacks = "fnParadigmPassiveFixationCallbacksNew"
+                GUI = "fnParadigmPassiveFixationGUINew"
+                Close = "fnParadigmPassiveFixationCloseNew"
+                ParadigmSwitch = "fnParadigmPassiveFixationParadigmSwitchNew"
+                StrobeCodes = "PassiveFixationStrobeCodesNew.txt"
 
-        <Paradigm Name = "Default"
-                  Init = "fnParadigmDefaultInit"
-                  Cycle = "fnParadigmDefaultCycle"
-                  Draw = "fnParadigmDefaultDraw"
-                  DrawCycle = "fnParadigmDefaultDrawCycle"
-                  Callbacks = "fnParadigmDefaultCallbacks"
-                  GUI = "fnParadigmDefaultGUI"
-                  Close = "fnParadigmDefaultClose"
-                  ParadigmSwitch = "fnParadigmDefaultParadigmSwitch"
-                  StrobeCodes = "DefualtStrobeCodes.txt"
-        > </Paradigm>
+                Initial_ShowPhotodiodeRect = "1"
+
+                Initial_ShowImagesOnLoad = "0"
+                Initial_RescaleToPower2 = "0"
+                Initial_PreloadTexturesVRAM = "1"
+
+                Initial_GazeBoxPix = "200"
+                Initial_JuiceTimeMS = "40"
+                Initial_JuiceTimeHighMS = "50"
+                Initial_BlinkTimeMS = "300"
+                Initial_GazeTimeMS = "3000"
+                Initial_GazeTimeLowMS = "3000"
+                Initial_PositiveIncrementPercent = "10"
+
+                Initial_BackgroundColor = "128 128 128"
+                Initial_FixationSizePix = "6"
+                Initial_StimulusSizePix = "150"
+                Initial_StimulusON_MS = "250"
+                Initial_StimulusOFF_MS = "150"
+                Initial_RandomStimuli = "1"
+
+                Initial_DefaultImageFolder = "C:\StimulusSet\"
+                Initial_DefaultImageList = "C:\StimulusSet\Monkey_Bodyparts\imlist.txt"
+                Initial_FavroiteList1 = "C:\StimulusSet\Monkey_Bodyparts\imlist.txt"
+
+                Initial_RandomPosition = "1"
+                Initial_RandomPositionMin = "50"
+                Initial_RandomPositionMax = "90"
+                Initial_RandomPositionRadius = "90"
+
+                Initial_HideStimulusWhenNotLooking = "1"
+
+                Initial_ParameterSweep = "0"
+
+      > </Paradigm>
 
 
         <Paradigm Name = "Five Dot Eye Calibration"
@@ -140,52 +191,7 @@
 
 
 
-        <Paradigm Name = "Passive Fixation New"
-                  Init = "fnParadigmPassiveFixationInitNew"
-                  Cycle = "fnParadigmPassiveFixationCycleNew"
-                  Draw = "fnParadigmPassiveFixationDrawNew"
-                  DrawCycle = "fnParadigmPassiveFixationDrawCycleNew"
-                  Callbacks = "fnParadigmPassiveFixationCallbacksNew"
-                  GUI = "fnParadigmPassiveFixationGUINew"
-                  Close = "fnParadigmPassiveFixationCloseNew"
-                  ParadigmSwitch = "fnParadigmPassiveFixationParadigmSwitchNew"
-                  StrobeCodes = "PassiveFixationStrobeCodesNew.txt"
 
-                  Initial_ShowPhotodiodeRect = "1"
-
-                  Initial_ShowImagesOnLoad = "0"
-                  Initial_RescaleToPower2 = "0"
-                  Initial_PreloadTexturesVRAM = "1"
-
-                  Initial_GazeBoxPix = "200"
-                  Initial_JuiceTimeMS = "40"
-                  Initial_JuiceTimeHighMS = "50"
-                  Initial_BlinkTimeMS = "300"
-                  Initial_GazeTimeMS = "3000"
-                  Initial_GazeTimeLowMS = "3000"
-                  Initial_PositiveIncrementPercent = "10"
-
-                  Initial_BackgroundColor = "128 128 128"
-                  Initial_FixationSizePix = "6"
-                  Initial_StimulusSizePix = "150"
-                  Initial_StimulusON_MS = "250"
-                  Initial_StimulusOFF_MS = "150"
-                  Initial_RandomStimuli = "1"
-
-                  Initial_DefaultImageFolder = "C:\StimulusSet\"
-                  Initial_DefaultImageList = "C:\StimulusSet\Monkey_Bodyparts\imlist.txt"
-                  Initial_FavroiteList1 = "C:\StimulusSet\Monkey_Bodyparts\imlist.txt"
-
-                  Initial_RandomPosition = "1"
-                  Initial_RandomPositionMin = "50"
-                  Initial_RandomPositionMax = "90"
-                  Initial_RandomPositionRadius = "90"
-
-                  Initial_HideStimulusWhenNotLooking = "1"
-
-                  Initial_ParameterSweep = "0"
-
-        > </Paradigm>
 
 
 
@@ -434,6 +440,8 @@
                   Initial_ParameterSweep = "0"
 
         > </Paradigm>
+
+      -->
 
     </Paradigms>
 

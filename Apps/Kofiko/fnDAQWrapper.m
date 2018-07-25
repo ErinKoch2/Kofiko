@@ -142,6 +142,20 @@ elseif strcmp(g_strctAppConfig.m_strctDAQ.m_strAcqusitionCard,'redbox')
   
 elseif strcmp(g_strctAppConfig.m_strctDAQ.m_strAcqusitionCard,'unity')
   % hacked together unity daq ... 
+  if ~strcmp(strCommand,'GetAnalog')
+      fprintf('sent command to DAQ:');
+      fprintf(strCommand);
+      for i=1:length(varargin)
+          try
+              fprintf( varargin{i}) ; 
+          catch
+            fprintf(sprintf('%.6f',varargin{i}))
+          end
+           
+      end
+      fprintf('\n');
+  end 
+  
   fCurrTime = GetSecs();
   switch strCommand
     case 'Init'
