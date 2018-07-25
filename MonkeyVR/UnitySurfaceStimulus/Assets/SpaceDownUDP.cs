@@ -14,6 +14,13 @@ using System.Collections;
 using System.Threading;
 
 public class SpaceDownUDP : MonoBehaviour {
+  // for fove
+  [SerializeField]
+  public FoveInterfaceBase foveInterface;
+  Vector3 left_eye_vector;
+  Vector3 right_eye_vector;
+
+  int kofiko_port_number = 1111;
   int port_number = 12345;
   static UdpClient udp;
   Thread thread;
@@ -26,16 +33,19 @@ public class SpaceDownUDP : MonoBehaviour {
   bool show_surface = true;
   float disappear_scale = 0.0001F;
   float rotation_amount = 25.0F; // in degrees
-  float x_distance = 7.0F;
+  // float x_distance = 7.0F;
+  float z_distance = 7.0F;
   float displacement_magnitude = 1.0F; // the width of the square is 2.5 to begin with
 
   Vector3 init_surface_size;
   Vector3 init_fixation_point_size;
 
   float rotation_y = 0.5f;
-  float rotation_z = 0.5f;
+  // float rotation_z = 0.5f;
+  float rotation_x = 0.5f;
+  float translation_x = 0.5f;
   float translation_y = 0.5f;
-  float translation_z = 0.5f;
+  // float translation_z = 0.5f;
 
 
   private void ThreadMethod() {
@@ -50,23 +60,42 @@ public class SpaceDownUDP : MonoBehaviour {
       lock (lockObject)
       {
         returnData = Encoding.ASCII.GetString(receiveBytes);
-        Debug.Log(returnData);
         string[] words = returnData.Split(',');
 
-        if (bool.Parse(words[0])) { // surface is to be turned on
-          rotation_y = float.Parse(words[1]);
-          rotation_z = float.Parse(words[2]);
-          translation_y = float.Parse(words[3]);
-          translation_z = float.Parse(words[4]);
+        if (words[0].Equals("surfaceOn")) {
+          rotation_x = float.Parse(words[1]);
+          rotation_y = float.Parse(words[2]);
+          translation_x = float.Parse(words[3]);
+          translation_y = float.Parse(words[4]);
 
           // assume surface is shown
           show_surface = true;
           triggered = true;
-        } else {
+        } else if (words[0].Equals("surfaceOff")) {
           // turn it off!!!
           show_surface = false;
           triggered = true;
+        } else if (words[0].Equals("getAnalog")) {
+          Debug.Log(left_eye_vector);
+          // Debug.Log(right_eye_vector);
+          Debug.Log(left_eye_vector.x);
+          Debug.Log(left_eye_vector.y);
+          Debug.Log(left_eye_vector.z);
+
+          double theta_L = -Math.Atan2( (double) left_eye_vector.x, (double) left_eye_vector.z);
+          double rho_L = Math.Atan2((double) left_eye_vector.y, (double) Math.Sqrt(left_eye_vector.x+left_eye_vector.x + left_eye_vector.z+left_eye_vector.z));
+          double theta_R = -Math.Atan2( (double) right_eye_vector.x, (double) right_eye_vector.z);
+          double rho_R = Math.Atan2((double) right_eye_vector.y, (double) Math.Sqrt(right_eye_vector.x+right_eye_vector.x + right_eye_vector.z+right_eye_vector.z));
+
+          Debug.Log(theta_L);
+          Debug.Log(rho_L);
+          // converts stuff into bytes
+          //string unicodeString =
+          //byte[] unicodeBytes = Encoding.Unicode.GetBytes(unicodeString);
+          //byte[] asciiBytes = Encoding.Convert(Encoding.Unicode, Encoding.ASCII, unicodeBytes);
+
         }
+
       }
     }
   }
@@ -89,6 +118,11 @@ public class SpaceDownUDP : MonoBehaviour {
   }
 
   private void Update() {
+    // update global eye positions
+    FoveInterfaceBase.EyeRays rays = foveInterface.GetGazeRays();
+    left_eye_vector = rays.left.direction;
+    right_eye_vector = rays.right.direction;
+
     if (triggered) {
 
       if (show_surface) {
@@ -100,19 +134,20 @@ public class SpaceDownUDP : MonoBehaviour {
 
         // float orientation_y = rotation_amount * (2 * UnityEngine.Random.value - 1);
         // float orientation_z = 90 + rotation_amount * (2 * UnityEngine.Random.value - 1);
+
+        float orientation_x = -90 + rotation_amount * (2 * rotation_x - 1);
         float orientation_y = rotation_amount * (2 * rotation_y - 1);
-        float orientation_z = 90 + rotation_amount * (2 * rotation_z - 1);
 
         Quaternion rotation = Quaternion.identity;
-        rotation.eulerAngles = new Vector3(0, orientation_y, orientation_z) ;
+        rotation.eulerAngles = new Vector3(orientation_x, orientation_y, 0) ;
         GameObject.Find ("surface").transform.localRotation = rotation ;
 
         // change position
         // float displacement_y = displacement_magnitude * (2 * UnityEngine.Random.value - 1);
         // float displacement_z = displacement_magnitude * (2 * UnityEngine.Random.value - 1);
         float displacement_y = displacement_magnitude * (2 * translation_y - 1);
-        float displacement_z = displacement_magnitude * (2 * translation_z - 1);
-        GameObject.Find ("surface").transform.localPosition = new Vector3(x_distance, displacement_y, displacement_z);
+        float displacement_x = displacement_magnitude * (2 * translation_x - 1);
+        GameObject.Find ("surface").transform.localPosition = new Vector3(displacement_x, displacement_y, z_distance);
 
         // make appear
         GameObject.Find ("fixation point").transform.localScale = init_fixation_point_size*disappear_scale;

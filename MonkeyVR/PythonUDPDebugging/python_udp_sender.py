@@ -17,12 +17,22 @@ i = 0
 while True:
     i += 1
     time.sleep(1)
-    message = str(i % 2 == 0) + "," + \
+    if i % 2 == 0:
+        word0 = "surfaceOn"
+    else:
+        word0 = "surfaceOff"
+    message = word0 + "," + \
               str(random.random()) + "," + str(random.random()) + "," + \
               str(random.random()) + "," + str(random.random()) 
 
     sock = socket.socket(socket.AF_INET, # Internet
                  socket.SOCK_DGRAM) # UDP
     sock.sendto(message, (UDP_IP, UDP_PORT))
-
     print message
+
+    message = "getAnalog"
+    sock = socket.socket(socket.AF_INET, # Internet
+                 socket.SOCK_DGRAM) # UDP
+    sock.sendto(message, (UDP_IP, UDP_PORT))
+    
+    

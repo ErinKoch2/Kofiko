@@ -164,6 +164,21 @@ elseif strcmp(g_strctAppConfig.m_strctDAQ.m_strAcqusitionCard,'unity')
     case 'TTL'
     case 'SetBit'
     case 'GetAnalog'
+        global g_strctDraw g_strctPTB g_strctServerCycle
+
+        udp=pnet('udpsocket',1111);
+        if udp~=-1,
+          fnLog('udp attempt');
+
+          try % Failsafe
+            host = '127.0.0.1';
+            port = 12345;
+            pnet(udp,'write','getAnalog');              % Write to write buffer
+            pnet(udp,'writepacket',host,port);   % Send buffer as UDP packet
+          end
+          pnet(udp,'close');
+        end
+
       x = 0;
       y = 0;
       aiRequiredValues = varargin{1};
