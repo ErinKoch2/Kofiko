@@ -70,12 +70,12 @@
 
     <DAQ
         VirtualDAQ = "1"
-        AcqusitionCard = "arduino"
+        AcqusitionCard = "unity"
         AcqusitionCardBoard = "0"
         JuicePort = "16"
         StartRecordPort = "17"
         StimulationPort = "18"
-        UseMouseClickAsEyePosition = "1"
+        UseMouseClickAsEyePosition = "0"
         MonitorIndexForEyePosition = "1"
         SimulateTouchScreenForDebug = "1"
 
@@ -172,26 +172,9 @@
                   Initial_StimulusOFF_MS = "150"
                   Initial_RandomStimuli = "1"
 
-                  Initial_DefaultImageFolder = "\\192.168.50.15\StimulusSet\"
-                  Initial_DefaultImageList = "\\192.168.50.15\StimulusSet\LargeFaceLocalizer\LargeFaceLocalizer.xml"
-
-                  Initial_FavroiteList1 = "\\192.168.50.15\StimulusSet\Monkey_Bodyparts\imlist.txt"
-                  Initial_FavroiteList2 = "\\192.168.50.15\StimulusSet\LargeFaceLocalizer\LargeFaceLocalizer.xml"
-                  Initial_FavroiteList3 = "\\192.168.50.15\StimulusSet\PassiveFixationMicrostim\Fixate_MicrostimCh2Only.xml"
-
-
-                  Initial_FavroiteList4 = "\\192.168.50.15\StimulusSet\ReverseCorrelation\ReverseCorrelation.xml"
-                  Initial_FavroiteList5 = "\\192.168.50.15\StimulusSet\StandardFaceLocalizer\V6\StandardFOB_v6.xml"
-
-                  Initial_FavroiteList6 = "\\192.168.50.15\StimulusSet\face_views\imlist_faceviews.txt"
-                  Initial_FavroiteList7 = "\\192.168.50.15\StimulusSet\Sinha_v2_FOB\Sinha_v2_FOB.txt"
-                  Initial_FavroiteList8 = "\\192.168.50.15\StimulusSet\Sinha_Profile\Sinha_Profile.txt"
-                  Initial_FavroiteList9 = "\\192.168.50.15\StimulusSet\Caltech256_VJ\ViolaJones.txt"
-                  Initial_FavroiteList10 = "\\192.168.50.15\StimulusSet\Illumination\Illumination.txt"
-                  Initial_FavroiteList11 = "\\192.168.50.15\StimulusSet\Sinha_Edges\Sinha_Edges.txt"
-                  Initial_FavroiteList12 = "\\192.168.50.15\StimulusSet\Sinha_v2_FOB_LP_32\Sinha_v2_FOB_LP_32.txt"
-                  Initial_FavroiteList13 = "\\192.168.50.15\StimulusSet\Sinha_v2_FOB_SecondTemplate\Sinha_v2_FOB_SecondTemplate.txt"
-                  Initial_FavroiteList14 = "\\192.168.50.15\StimulusSet\CMU_CBCL_Experiment\CMU_CBCL_Experiment.txt"
+                  Initial_DefaultImageFolder = "C:\StimulusSet\"
+                  Initial_DefaultImageList = "C:\StimulusSet\Monkey_Bodyparts\imlist.txt"
+                  Initial_FavroiteList1 = "C:\StimulusSet\Monkey_Bodyparts\imlist.txt"
 
                   Initial_RandomPosition = "1"
                   Initial_RandomPositionMin = "50"
