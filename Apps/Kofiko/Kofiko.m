@@ -115,10 +115,10 @@ if g_strctAppConfig.m_strctStimulusServer.m_fSingleComputerMode
     g_strctStimulusServer.m_iSocket = [];
     g_strctStimulusServer.m_strIP = [];%g_strctAppConfig.m_strctStimulusServer.m_strAddress;
     g_strctStimulusServer.m_iPort = [];%g_strctAppConfig.m_strctStimulusServer.m_fPort;
-    % [fWidth, fHeight] = Screen( 'WindowSize', g_strctAppConfig.m_strctStimulusServer.m_fPTBScreen);
-    % g_strctStimulusServer.m_aiScreenSize = [0 0 fWidth, fHeight] + ...
-    %     g_strctAppConfig.m_strctStimulusServer.m_afVisibleOffset;
-    g_strctStimulusServer.m_aiScreenSize = [0 0 1 1];
+    [fWidth, fHeight] = Screen( 'WindowSize', g_strctAppConfig.m_strctStimulusServer.m_fPTBScreen);
+    g_strctStimulusServer.m_aiScreenSize = [0 0 fWidth, fHeight] + ...
+        g_strctAppConfig.m_strctStimulusServer.m_afVisibleOffset;
+    %g_strctStimulusServer.m_aiScreenSize = [0 0 1 1];
     g_strctStimulusServer.m_fRefreshRateHz = fRefreshRate;
     g_strctStimulusServer.m_fRefreshRateMS = 1/fRefreshRate*1000;
     g_strctStimulusServer.m_bConnected = true;
