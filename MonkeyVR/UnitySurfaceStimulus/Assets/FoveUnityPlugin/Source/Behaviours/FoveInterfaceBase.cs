@@ -33,16 +33,16 @@ namespace UnityEngine
 
 		/**
 		 * MonoBehaviour Implementation
-		 * 
+		 *
 		 * The pieces required and used by the MonoBehaviour subclass when attached to a GameObject in the
 		 * scene. This behaviour does not function unless there is a single instance of this class
 		 * instantiated in the scene.
 		 */
 		[Tooltip("INTERMEDIATE: Override the default distance between the \"eyes\" of the cameras")]
-		[SerializeField] protected float interOcularDistance = 0.06f;
+		[SerializeField] protected float interOcularDistance = 0.039f;
 
 		[SerializeField] protected float eyeHeight = 0.0f;
-		[SerializeField] protected float eyeForward = -0.04f;
+		[SerializeField] protected float eyeForward = 0.00f;
 		[SerializeField] protected bool useCustomEyePlacement = false;
 
 		[Tooltip(
@@ -110,7 +110,7 @@ namespace UnityEngine
 		{
 			return _sHeadset;
 		}
-		
+
 		protected static bool _sIsStaticInitialized;
 		protected static bool _sHasUpdatedStaticData;
 		protected static bool _sNeedsNewRenderPose;
@@ -596,7 +596,7 @@ namespace UnityEngine
 				hit = new RaycastHit();
 				return false;
 			}
-			
+
 			if (col.Raycast(_eyeRayLeft, out hit, _farClip))
 				return true;
 
@@ -968,7 +968,7 @@ namespace UnityEngine
 
 		/// <summary>
 		/// Reset headset orientation.
-		/// 
+		///
 		/// <para>This sets the HMD's current rotation as a "zero" orientation, essentially resetting their
 		/// orientation to that set in the editor.</para>
 		/// </summary>
