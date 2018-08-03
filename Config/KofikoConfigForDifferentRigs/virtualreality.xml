@@ -26,10 +26,10 @@
     > </VideoStreaming>
 
     <EyeCalib
-        CenterX = "1000"
-        CenterY = "1000"
-        ScaleX = "100"
-        ScaleY = "100"
+        CenterX = "0"
+        CenterY = "0"
+        ScaleX = "10000"
+        ScaleY = "10000"
     > </EyeCalib>
 
     <VarSave

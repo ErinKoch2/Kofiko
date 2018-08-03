@@ -5,11 +5,15 @@
 *.dll
 *.mdb
 *.resource
+MonkeyVR/UnitySurfaceStimulus/UnityCrashHandler64.exe
+MonkeyVR/UnitySurfaceStimulus/UnitySurfaceStimulus.exe
 MonkeyVR/UnitySurfaceStimulus/.vs/
 MonkeyVR/UnitySurfaceStimulus/Library/
 MonkeyVR/UnitySurfaceStimulus/Packages/
 MonkeyVR/UnitySurfaceStimulus/ProjectSettings/
 MonkeyVR/UnitySurfaceStimulus/Temp/
+MonkeyVR/UnitySurfaceStimulus/Mono/
+MonkeyVR/UnitySurfaceStimulus/UnitySurfaceStimulus_Data/
 Data/Logs/
 g_strctAppConfig.m_strctDirectories
 Config/StimServerConfigForDifferentRigs/StimServerCache.mat

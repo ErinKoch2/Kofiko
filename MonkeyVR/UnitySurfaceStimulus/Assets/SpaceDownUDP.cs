@@ -23,6 +23,7 @@ public class SpaceDownUDP : MonoBehaviour {
   int kofiko_port_number = 1111;
   int port_number = 12345;
   static UdpClient udp;
+  static UdpClient udp_kofiko;
   Thread thread;
   static readonly object lockObject = new object();
   string returnData = "";
@@ -47,11 +48,15 @@ public class SpaceDownUDP : MonoBehaviour {
   float translation_y = 0.5f;
   // float translation_z = 0.5f;
 
+  IPEndPoint endPoint;
+
 
   private void ThreadMethod() {
     print ("This loop is running!");
 
     udp = new UdpClient(12345);
+    udp_kofiko = new UdpClient("127.0.0.1", kofiko_port_number);
+
     while (true) {
       IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, port_number);
 
@@ -76,23 +81,28 @@ public class SpaceDownUDP : MonoBehaviour {
           show_surface = false;
           triggered = true;
         } else if (words[0].Equals("getAnalog")) {
-          Debug.Log(left_eye_vector);
+          // Debug.Log(left_eye_vector);
           // Debug.Log(right_eye_vector);
-          Debug.Log(left_eye_vector.x);
-          Debug.Log(left_eye_vector.y);
-          Debug.Log(left_eye_vector.z);
+          // Debug.Log(left_eye_vector.x);
+          // Debug.Log(left_eye_vector.y);
+          // Debug.Log(left_eye_vector.z);
 
           double theta_L = -Math.Atan2( (double) left_eye_vector.x, (double) left_eye_vector.z);
-          double rho_L = Math.Atan2((double) left_eye_vector.y, (double) Math.Sqrt(left_eye_vector.x+left_eye_vector.x + left_eye_vector.z+left_eye_vector.z));
+          double rho_L = Math.Atan2((double) left_eye_vector.y, (double) Math.Sqrt(left_eye_vector.x*left_eye_vector.x + left_eye_vector.z*left_eye_vector.z));
           double theta_R = -Math.Atan2( (double) right_eye_vector.x, (double) right_eye_vector.z);
-          double rho_R = Math.Atan2((double) right_eye_vector.y, (double) Math.Sqrt(right_eye_vector.x+right_eye_vector.x + right_eye_vector.z+right_eye_vector.z));
+          double rho_R = Math.Atan2((double) right_eye_vector.y, (double) Math.Sqrt(right_eye_vector.x*right_eye_vector.x + right_eye_vector.z*right_eye_vector.z));
 
-          Debug.Log(theta_L);
-          Debug.Log(rho_L);
+          // Debug.Log(theta_L);
+          // Debug.Log(rho_L);
           // converts stuff into bytes
-          //string unicodeString =
+          string dataString = theta_L.ToString() + "," + rho_L.ToString() + "," + theta_R.ToString() + "," + rho_R.ToString();
+          // Debug.Log(dataString);
+          byte[] send_buffer = Encoding.ASCII.GetBytes(dataString);
           //byte[] unicodeBytes = Encoding.Unicode.GetBytes(unicodeString);
           //byte[] asciiBytes = Encoding.Convert(Encoding.Unicode, Encoding.ASCII, unicodeBytes);
+          udp_kofiko.Send(send_buffer, send_buffer.Length);
+          // Debug.Log("done sending!");
+
 
         }
 
@@ -114,6 +124,7 @@ public class SpaceDownUDP : MonoBehaviour {
     } else {
       GameObject.Find ("surface").transform.localScale = init_surface_size*disappear_scale;
     }
+    endPoint = new IPEndPoint(IPAddress.Any, kofiko_port_number);
 
   }
 
