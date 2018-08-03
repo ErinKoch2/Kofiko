@@ -40,6 +40,8 @@ fnParadigmToKofikoComm('ClearMessageBuffer');
 % Instruct stimulus server to load the required files.
 bForceStereoForMonocularLists = fnTsGetVar(g_strctParadigm,'ForceStereoOnMonocularLists') > 0;
 
+%{
+% taking out all paradigmtostimserver stuff -MYZ
 if bStereoRequired || bForceStereoForMonocularLists
     fnParadigmToStimulusServer('SetStereoMonoMode','Stereo');
 else
@@ -47,24 +49,31 @@ else
 end
 
 fnParadigmToStimulusServer('ForceMessage','LoadImageList',acFileNames);
+%}
+
 % Now, load these files locally as well...
 fnParadigmPassiveCleanTextureMemory();
 
   bShowWhileLoading =  isfield(g_strctParadigm,'m_bShowWhileLoading') && g_strctParadigm.m_bShowWhileLoading ;
- 
+
 [g_strctParadigm.m_strctTexturesBuffer.m_ahHandles,...
     g_strctParadigm.m_strctTexturesBuffer.m_a2iTextureSize,...
     g_strctParadigm.m_strctTexturesBuffer.m_abIsMovie,...
     g_strctParadigm.m_strctTexturesBuffer.m_aiApproxNumFrames,...
     g_strctParadigm.m_strctTexturesBuffer.m_afMovieLengthSec,...
     g_strctParadigm.m_strctTexturesBuffer.m_acImages] = fnInitializeTexturesAux(acFileNames,bShowWhileLoading,false);
-    
+
+
+
+%{
 bTimeout = fnParadigmToKofikoComm('BlockUntilMessage','LoadedImage', length(acFileNames),10); % 10 sec timeout
 if bTimeout
         fnParadigmToKofikoComm('DisplayMessage','Stimulus server not finished loading!!!!');
 end
+%}
+
 return;
- 
+
 
 function [acFilesNames, acMediaToHandleIndex] = fnMediaToFilesToLoad(astrctMedia)
 acAllFiles = cell(0);
@@ -96,7 +105,7 @@ if exist(strCatFile,'file')
     Tmp = load(strCatFile);
     a2bStimulusToCondition = Tmp.a2bStimulusCategory > 0;
     acConditionNames = Tmp.acCatNames;
-    
+
     if size(a2bStimulusToCondition,1) ~= iNumMediaFiles || size(a2bStimulusToCondition,2) ~= length(acConditionNames)
         fnParadigmToKofikoComm('DisplayMessage','Category file does not match list!');
         acConditionNames = [];
@@ -117,7 +126,7 @@ hFileID = fopen(strXMLfile,'w+');
 fprintf(hFileID,'<Config>\n\n');
 fprintf(hFileID,'    <Media>\n');
 for iFileIter=1:length(acFileNames)
-    
+
     strAttributes = '';
      if ~isempty(acMediaAttributes{iFileIter} )
          iNumAttributes = length(acMediaAttributes{iFileIter});
@@ -128,9 +137,9 @@ for iFileIter=1:length(acFileNames)
                 strAttributes = [strAttributes,';',acMediaAttributes{iFileIter}{iAttrIter}];
             end
          end
-         
+
      end
-     
+
     [strDummy, strName] = fileparts(acFileNames{iFileIter});
      fprintf(hFileID,'        <Image Name = "%s" FileName = "%s"  Attr = "%s"> </Image>\n',strName,acFileNames{iFileIter},strAttributes);
 end
@@ -138,13 +147,13 @@ end
 fprintf(hFileID,'\n    </Media>\n');
  fprintf(hFileID,'    <Conditions>\n');
  iNumConditions = length(acConditionNames);
- for iCondIter=1:iNumConditions       
+ for iCondIter=1:iNumConditions
      fprintf(hFileID,'        <Condition Name = "%s" ValidAttributes = "%s" DefaultVisibility = "1"> </Condition>\n',acConditionNames{iCondIter},acConditionNames{iCondIter});
- end  
+ end
   fprintf(hFileID,'    </Conditions>\n');
-  
-  
-      
+
+
+
 fprintf(hFileID,'    <StatServer\n');
 fprintf(hFileID,'        NumTrialsInCircularBuffer = "200"\n');
 fprintf(hFileID,'        Pre_TimeSec = "0.5"\n');
@@ -154,9 +163,3 @@ fprintf(hFileID,'    > </StatServer>   \n');
 fprintf(hFileID,'</Config>\n\n');
 fclose(hFileID);
 return;
-
-
-
-
-
-

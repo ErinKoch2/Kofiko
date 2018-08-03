@@ -25,10 +25,13 @@ iPhotoDiodeWindowPix = g_strctParadigm.m_iPhotoDiodeWindowPix;
 Screen('FillRect',g_strctPTB.m_hWindow, afBackgroundColor);
 
 %% Draw Stimulus
+% find a way to display instead the stimulus orientation!
 if ~isempty(g_strctParadigm.m_strctCurrentTrial) && g_strctParadigm.m_bStimulusDisplayed && isfield(g_strctParadigm.m_strctCurrentTrial,'m_iStimulusIndex') && ...
         g_strctParadigm.m_iMachineState ~= 6
     % Trial exist. Check state and draw either the image g_strctParadigm.m_strctCurrentTrial
     iMediaToDisplay = g_strctParadigm.m_strctCurrentTrial.m_iStimulusIndex;
+    % myz delete all the bugs!
+    %{
     switch g_strctParadigm.m_strctDesign.m_astrctMedia(iMediaToDisplay).m_strMediaType
         case 'Image'
             fnDisplayMonocularImageLocally();
@@ -41,6 +44,7 @@ if ~isempty(g_strctParadigm.m_strctCurrentTrial) && g_strctParadigm.m_bStimulusD
         otherwise
             assert(false);
     end
+    %}
 end
 
 %% Photodiode Crap

@@ -305,10 +305,36 @@ switch lower(strCommand)
             end
         end
         varargout{1} = bTimeOut;
-        return 
+        
+    case 'unityshowgrating'
+        udp=pnet('udpsocket',1111);
+        if udp~=-1,
+          fnLog('udp attempt');
+
+          try % Failsafe
+            host = '127.0.0.1';
+            port = 12345;
+            pnet(udp,'write',sprintf('true,%f,%f,%f,%f', varargin{1},varargin{2},varargin{3},varargin{4}));              % Write to write buffer
+            pnet(udp,'writepacket',host,port);   % Send buffer as UDP packet
+          end
+          pnet(udp,'close');
+
+        end
+    case 'unityhidegrating'
+        udp=pnet('udpsocket',1111);
+        if udp~=-1,
+          try % Failsafe
+            host = '127.0.0.1';
+            port = 12345;
+            pnet(udp,'write','false,0.5,0.5,0.5,0.5');              % Write to write buffer
+            pnet(udp,'writepacket',host,port);   % Send buffer as UDP packet
+          end
+          pnet(udp,'close');
+    end
     otherwise
-        % unknown kofiko command
-        fnParadigmToKofikoComm('DisplayMessage', sprintf('Unknown API : %s', strCommand));
+    % unknown kofiko command
+    fnParadigmToKofikoComm('DisplayMessage', sprintf('Unknown API : %s', strCommand));
+        
 end
 
 return;

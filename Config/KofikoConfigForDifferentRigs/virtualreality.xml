@@ -25,16 +25,11 @@
         SampleRateHz = "0"
     > </VideoStreaming>
 
-    <RealTimeStatisticsServer
-        Address = "192.168.50.7"
-        Port = "4004"
-    > </RealTimeStatisticsServer>
-
     <EyeCalib
-        CenterX = "0"
-        CenterY = "0"
-        ScaleX = "0"
-        ScaleY = "0"
+        CenterX = "1000"
+        CenterY = "1000"
+        ScaleX = "100"
+        ScaleY = "100"
     > </EyeCalib>
 
     <VarSave
@@ -50,7 +45,7 @@
     <GUIParams
         PTBScreen = "0"
         Experimental = "0"
-        Debug = "0"
+        Debug = "0"	
         JuiceMl_To_Ms = "466.95"
         JuiceTimeMS = "45"
         JuiceKey = "74"
@@ -73,7 +68,7 @@
     > </GUIParams>
 
     <DAQ
-        VirtualDAQ = "1"
+        VirtualDAQ = "0"
         AcqusitionCard = "unity"
         AcqusitionCardBoard = "0"
         JuicePort = "16"
@@ -131,8 +126,8 @@ s
                 Initial_PreloadTexturesVRAM = "1"
 
                 Initial_GazeBoxPix = "200"
-                Initial_JuiceTimeMS = "40"
-                Initial_JuiceTimeHighMS = "50"
+                Initial_JuiceTimeMS = "400"
+                Initial_JuiceTimeHighMS = "500"
                 Initial_BlinkTimeMS = "300"
                 Initial_GazeTimeMS = "3000"
                 Initial_GazeTimeLowMS = "3000"
@@ -141,17 +136,17 @@ s
                 Initial_BackgroundColor = "128 128 128"
                 Initial_FixationSizePix = "6"
                 Initial_StimulusSizePix = "150"
-                Initial_StimulusON_MS = "250"
-                Initial_StimulusOFF_MS = "150"
+                Initial_StimulusON_MS = "1000"
+                Initial_StimulusOFF_MS = "500"
                 Initial_RandomStimuli = "1"
 
                 Initial_DefaultImageFolder = "C:\StimulusSet\"
                 Initial_DefaultImageList = "C:\StimulusSet\Monkey_Bodyparts\imlist.txt"
                 Initial_FavroiteList1 = "C:\StimulusSet\Monkey_Bodyparts\imlist.txt"
 
-                Initial_RandomPosition = "1"
-                Initial_RandomPositionMin = "50"
-                Initial_RandomPositionMax = "90"
+                Initial_RandomPosition = "0"
+                Initial_RandomPositionMin = "1"
+                Initial_RandomPositionMax = "2"
                 Initial_RandomPositionRadius = "90"
 
                 Initial_HideStimulusWhenNotLooking = "1"
