@@ -16,6 +16,11 @@ if ~isempty(acInputFromKofiko)
             g_strctDraw.m_pt2fPos = acInputFromKofiko{2};
             g_strctDraw.m_fSize = acInputFromKofiko{3};
             g_strctDraw.m_afBackgroundColor = acInputFromKofiko{4};
+            if length(acInputFromKofiko) == 5
+                g_strctDraw.m_fDisparityMeters = acInputFromKofiko{5};
+            else 
+                g_strctDraw.m_fDisparityMeters = 10;
+            end
             g_strctServerCycle.m_iMachineState = 1;
     end
 end;
@@ -32,7 +37,25 @@ switch g_strctServerCycle.m_iMachineState
             g_strctDraw.m_pt2fPos(2) + g_strctDraw.m_fSize];
 
         Screen(g_strctPTB.m_hWindow,'FillArc',[255 255 255], aiFixationSpot,0,360);
+        
+        
+        udp=pnet('udpsocket',1111);
+        if udp~=-1,
+          fnLog('udp attempt');
+
+          try % Failsafe
+            host = '127.0.0.1';
+            port = 12345;
+            pnet(udp,'write', sprintf('calibrationOn,%f,%f,%f,%f', g_strctDraw.m_pt2fPos(1),g_strctDraw.m_pt2fPos(2),g_strctDraw.m_fSize,g_strctDraw.m_fDisparityMeters));      
+            pnet(udp,'writepacket',host,port);   % Send buffer as UDP packet
+          end
+          pnet(udp,'close');
+        end
+
+        
+        
         g_strctServerCycle.m_iMachineState = 0;
+        
 
         g_strctServerCycle.m_fLastFlipTime = fnFlipWrapper(g_strctPTB.m_hWindow, 0, 0, 2);
 end

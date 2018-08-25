@@ -24,10 +24,13 @@ if ~isempty(acInputFromKofiko)
             else
                 Screen(g_strctPTB.m_hWindow,'FillRect',0);
             end
-            fnFlipWrapper(g_strctPTB.m_hWindow);
+            fnFlipWrapper(g_strctPTB.m_hWindow); 
             g_strctServerCycle.m_iMachineState = 0;
         case 'LoadImageList'
             acFileNames = acInputFromKofiko{2};
+            for i=1:length(acFileNames) 
+               acFileNames{i} = strrep(acFileNames{i},'\\kofiko-23d\','C:\') 
+            end
             Screen(g_strctPTB.m_hWindow,'FillRect',0);
             fnFlipWrapper(g_strctPTB.m_hWindow);
 
@@ -73,13 +76,10 @@ switch g_strctServerCycle.m_iMachineState
     case 0
         % Do nothing
     case 1
-        fnLog('case 1');
         fnDisplayMonocularImage();
-        fnSendUdpPacketStop();
     case 2
         fnWaitMonocularImageONPeriod();
     case 3
-        fnSendUdpPacketStart() ;
         fnWaitMonocularImageOFFPeriod();
     case 4
         fnDisplayMonocularMovie();
@@ -111,6 +111,26 @@ Screen('FillRect',g_strctPTB.m_hWindow, g_strctDraw.m_strctTrial.m_afBackgroundC
 aiFixationRect = [g_strctDraw.m_strctTrial.m_pt2iFixationSpot-g_strctDraw.m_strctTrial.m_fFixationSizePix,...
     g_strctDraw.m_strctTrial.m_pt2iFixationSpot+g_strctDraw.m_strctTrial.m_fFixationSizePix];
 
+
+
+udp=pnet('udpsocket',1111);
+if udp~=-1,
+  fnLog('udp attempt');
+
+  try % Failsafe
+    host = '127.0.0.1';
+    port = 12345;
+    pnet(udp,'write', sprintf('surfaceOn,%f,%f,%f,%f', g_strctDraw.m_strctTrial.m_fRotationX,...
+        g_strctDraw.m_strctTrial.m_fRotationY,...
+        g_strctDraw.m_strctTrial.m_fTranslationX,...
+        g_strctDraw.m_strctTrial.m_fTranslationY));      
+    pnet(udp,'writepacket',host,port);   % Send buffer as UDP packet
+  end
+  pnet(udp,'close');
+end
+
+%{ 
+% taking this out!!! 
 % fnLog(g_strctDraw.m_strctTrial.m_strctMedia.m_aiMediaToHandleIndexInBuffer(1));
 hTexturePointer = g_strctDraw.m_strctTrial.m_strctMedia.m_aiMediaToHandleIndexInBuffer(1);
 aiTextureSize = g_strctDraw.m_a2iTextureSize(:, hTexturePointer);
@@ -139,7 +159,7 @@ if g_strctDraw.m_strctTrial.m_bNoiseOverlay
 else
     Screen('DrawTexture', g_strctPTB.m_hWindow, g_strctDraw.m_ahHandles(hTexturePointer),[],aiStimulusRect, g_strctDraw.m_strctTrial.m_fRotationAngle);
 end
-
+%}
 
 if g_strctDraw.m_strctTrial.m_bShowPhotodiodeRect
     Screen('FillRect',g_strctPTB.m_hWindow,[255 255 255], ...
@@ -164,6 +184,21 @@ fCurrTime  = GetSecs();
 
 if (fCurrTime - g_strctServerCycle.m_fLastFlipTime) > g_strctDraw.m_strctTrial.m_fStimulusON_MS/1e3 - (0.2 * (1/g_strctPTB.m_iRefreshRate) )
     % Turn stimulus off
+    
+    udp=pnet('udpsocket',1111);
+    if udp~=-1,
+      fnLog('udp attempt');
+
+      try % Failsafe
+        host = '127.0.0.1';
+        port = 12345;
+        pnet(udp,'write', 'surfaceOff');      
+        pnet(udp,'writepacket',host,port);   % Send buffer as UDP packet
+      end
+      pnet(udp,'close');
+    end
+    
+    
     if g_strctDraw.m_strctTrial.m_fStimulusOFF_MS > 0
         Screen('FillRect',g_strctPTB.m_hWindow, g_strctDraw.m_strctTrial.m_afBackgroundColor);
 
@@ -171,6 +206,9 @@ if (fCurrTime - g_strctServerCycle.m_fLastFlipTime) > g_strctDraw.m_strctTrial.m
             g_strctDraw.m_strctTrial.m_pt2iFixationSpot+g_strctDraw.m_strctTrial.m_fFixationSizePix];
 
         Screen('FillArc',g_strctPTB.m_hWindow,[255 255 255], aiFixationRect,0,360);
+        
+
+
 
         if g_strctDraw.m_strctTrial.m_bShowPhotodiodeRect
 
@@ -583,44 +621,5 @@ fLastFlipTime = fnFlipWrapper(g_strctPTB.m_hWindow, g_strctDraw.m_fMovieOnset+fT
 g_strctDraw.m_iFrameCounter = g_strctDraw.m_iFrameCounter + 1;
 g_strctDraw.m_a2fFrameFlipTS(1,g_strctDraw.m_iFrameCounter) = fTimeToFlip;   % Relative to movie onset
 g_strctDraw.m_a2fFrameFlipTS(2,g_strctDraw.m_iFrameCounter) = fLastFlipTime; % Actual Flip Time
-
-return;
-
-function fnSendUdpPacketStart()
-global g_strctDraw g_strctPTB g_strctServerCycle
-    fCurrTime  = GetSecs();
-
-    udp=pnet('udpsocket',1111);
-    if udp~=-1,
-      fnLog('udp attempt');
-
-      try % Failsafe
-        host = '127.0.0.1';
-        port = 12345;
-
-        r = rand(4,1); 
-        pnet(udp,'write',sprintf('true,%f,%f,%f,%f', r(1),r(2),r(3),r(4)));              % Write to write buffer
-        pnet(udp,'writepacket',host,port);   % Send buffer as UDP packet
-      end
-      pnet(udp,'close');
-    end
-return;
-
-function fnSendUdpPacketStop() 
-global g_strctDraw g_strctPTB g_strctServerCycle
-    fCurrTime  = GetSecs();
-
-    udp=pnet('udpsocket',1111);
-    if udp~=-1,
-      fnLog('udp attempt');
-
-      try % Failsafe
-        host = '127.0.0.1';
-        port = 12345;
-        pnet(udp,'write','false,0.5,0.5,0.5,0.5');              % Write to write buffer
-        pnet(udp,'writepacket',host,port);   % Send buffer as UDP packet
-      end
-      pnet(udp,'close');
-    end
 
 return;
