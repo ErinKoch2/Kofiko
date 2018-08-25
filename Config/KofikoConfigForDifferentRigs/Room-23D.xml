@@ -10,9 +10,9 @@
 
 <StimulusServer
     SingleComputerMode = "0"
-    PTBScreen = "2"
-    Address = "192.168.50.163"
-    Port = "1502"
+    PTBScreen = "0"
+    Address = "192.168.50.40"
+    Port = "1501"
 > </StimulusServer>
 
 <RemoteAccess
@@ -25,7 +25,7 @@
 > </VideoStreaming>
 
 <RealTimeStatisticsServer
-    Address = "192.168.50.96"
+    Address = "192.168.50.1"
     Port = "4003"    
 > </RealTimeStatisticsServer>
 
@@ -137,6 +137,7 @@
         Initial_EyeTracesRefreshMS = "500"
         Initial_EyeTracesBufferSize = "1000"
         Initial_PositiveIncrementPercent = "10"
+        Initial_DisparityMeters = "7"
   
    > </Paradigm>
 
@@ -160,11 +161,11 @@
         Initial_PreloadTexturesVRAM = "1"
 
         Initial_GazeBoxPix = "100"
-        Initial_JuiceTimeMS = "35"
-        Initial_JuiceTimeHighMS = "40"
+        Initial_JuiceTimeMS = "45"
+        Initial_JuiceTimeHighMS = "50"
         Initial_BlinkTimeMS = "200"
         Initial_GazeTimeMS = "6000"
-        Initial_GazeTimeLowMS = "6000"
+        Initial_GazeTimeLowMS = "5000"
         Initial_PositiveIncrementPercent = "10"
 
         Initial_BackgroundColor = "128 128 128"
@@ -180,7 +181,7 @@
         Initial_FavroiteList1 = "\\kofiko-23d\StimulusSet\Monkey_Bodyparts\imlist.txt"
         Initial_FavroiteList2 = "\\kofiko-23d\StimulusSet\Monkey_Bodyparts\faces_only.txt"
         
-        Initial_RandomPosition = "1"
+        Initial_RandomPosition = "0"
         Initial_RandomPositionMin = "50"
         Initial_RandomPositionMax = "90"
         Initial_RandomPositionRadius = "90"

@@ -1,4 +1,4 @@
-function strctTrial = fnPassiveFixationPrepareTrial()
+    function strctTrial = fnPassiveFixationPrepareTrial()
 %
 % Copyright (c) 2008 Shay Ohayon, California Institute of Technology.
 % This file is a part of a free software. you can redistribute it and/or modify
@@ -38,12 +38,14 @@ end
 
 %% Select new fixation and stimulus positions
 if g_strctParadigm.m_bRandFixPos
-    aiScreenSize = fnParadigmToKofikoComm('GetStimulusServerScreenSize');
+    % aiScreenSize = fnParadigmToKofikoComm('GetStimulusServerScreenSize');
+    aiScreenSize = [0 0 1080 540] ; 
     g_strctParadigm.m_iRandFixCounter = g_strctParadigm.m_iRandFixCounter + 1;
     if g_strctParadigm.m_iRandFixCounter >= g_strctParadigm.m_iRandFixCounterMax
         g_strctParadigm.m_iRandFixCounter = 0;
         g_strctParadigm.m_iRandFixCounterMax = g_strctParadigm.m_fRandFixPosMin + round(rand() * (g_strctParadigm.m_fRandFixPosMax-g_strctParadigm.m_fRandFixPosMin));
         pt2iCenter = aiScreenSize(3:4)/2;
+        fprintf(sprintf(pt2iCenter));
         pt2iNewFixationSpot = 2*(rand(1,2)-0.5) * g_strctParadigm.m_fRandFixRadius + pt2iCenter;
         % set a new random position for fixation point
         fnTsSetVarParadigm('FixationSpotPix',pt2iNewFixationSpot);
@@ -60,6 +62,10 @@ strctTrial.m_iStimulusIndex = iNewStimulusIndex;
 strctTrial.m_strctMedia = g_strctParadigm.m_strctDesign.m_astrctMedia(iNewStimulusIndex);
 
 strctTrial.m_pt2iFixationSpot = g_strctParadigm.FixationSpotPix.Buffer(1,:,g_strctParadigm.FixationSpotPix.BufferIdx);
+
+aiScreenSize = [0 0 1080 540] ;
+strctTrial.m_pt2iFixationSpot = aiScreenSize(3:4)/2;
+
 strctTrial.m_pt2fStimulusPos = g_strctParadigm.StimulusPos.Buffer(1,:,g_strctParadigm.StimulusPos.BufferIdx);
 strctTrial.m_afBackgroundColor = squeeze(g_strctParadigm.BackgroundColor.Buffer(1,:,g_strctParadigm.BackgroundColor.BufferIdx));
 strctTrial.m_fFixationSizePix = g_strctParadigm.FixationSizePix.Buffer(1,:,g_strctParadigm.FixationSizePix.BufferIdx);
@@ -77,6 +83,13 @@ end
 strctTrial.m_fRotationAngle = g_strctParadigm.RotationAngle.Buffer(1,:,g_strctParadigm.RotationAngle.BufferIdx);
 strctTrial.m_bShowPhotodiodeRect = g_strctParadigm.m_bShowPhotodiodeRect;
 strctTrial.m_iPhotoDiodeWindowPix = g_strctParadigm.m_iPhotoDiodeWindowPix;
+
+
+strctTrial.m_fRotationX = rand(1);
+strctTrial.m_fRotationY = rand(1);
+strctTrial.m_fTranslationX = rand(1);
+strctTrial.m_fTranslationY = rand(1);
+
 
 return;
 
@@ -102,7 +115,8 @@ return;
 
 function [iNewStimulusIndex,iSelectedBlock]=  fnSelectNextStimulusUsingParameterSweep()
 global g_strctParadigm
-aiScreenSize = fnParadigmToKofikoComm('GetStimulusServerScreenSize');
+% aiScreenSize = fnParadigmToKofikoComm('GetStimulusServerScreenSize');
+aiScreenSize = [0 0 1080 540];
 iSelectedBlock = [];
 
 iNewStimulusIndex = g_strctParadigm.m_a2fParamSpace(g_strctParadigm.m_strctParamSweep.m_iParamSweepIndex,1);
@@ -112,6 +126,10 @@ fSize = g_strctParadigm.m_a2fParamSpace(g_strctParadigm.m_strctParamSweep.m_iPar
 fTheta = g_strctParadigm.m_a2fParamSpace(g_strctParadigm.m_strctParamSweep.m_iParamSweepIndex,5);
 fON = g_strctParadigm.m_a2fParamSpace(g_strctParadigm.m_strctParamSweep.m_iParamSweepIndex,6);
 fOFF = g_strctParadigm.m_a2fParamSpace(g_strctParadigm.m_strctParamSweep.m_iParamSweepIndex,7);
+
+fX = 0;
+fY = 0; 
+
 
 pt2fStimulusPosition = aiScreenSize(3:4)/2 + [fX,fY];
 

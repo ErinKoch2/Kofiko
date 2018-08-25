@@ -32,6 +32,7 @@ g_strctParadigm.m_fInsideGazeRectTimer = 0;
 iBufferLen = 30000;
 strctStimulusParams = fnTsAddVar([], 'FixationSpotPix', g_strctStimulusServer.m_aiScreenSize(3:4)/2, iBufferLen);
 strctStimulusParams = fnTsAddVar(strctStimulusParams, 'FixationSizePix', g_strctParadigm.m_fInitial_FixationSizePix, 100);
+strctStimulusParams = fnTsAddVar(strctStimulusParams, 'DisparityMeters', g_strctParadigm.m_fInitial_DisparityMeters, 100);
 strctStimulusParams = fnTsAddVar(strctStimulusParams, 'SpreadPix', g_strctParadigm.m_fInitial_SpreadPix, 100);
 strctStimulusParams = fnTsAddVar(strctStimulusParams, 'GazeBoxPix', g_strctParadigm.m_fInitial_GazeBoxPix, 100);
 strctStimulusParams = fnTsAddVar(strctStimulusParams, 'BackgroundColor', g_strctParadigm.m_afInitial_BackgroundColor, 100);

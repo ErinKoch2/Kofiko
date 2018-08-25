@@ -25,16 +25,13 @@ iPhotoDiodeWindowPix = g_strctParadigm.m_iPhotoDiodeWindowPix;
 Screen('FillRect',g_strctPTB.m_hWindow, afBackgroundColor);
 
 %% Draw Stimulus
-% find a way to display instead the stimulus orientation!
 if ~isempty(g_strctParadigm.m_strctCurrentTrial) && g_strctParadigm.m_bStimulusDisplayed && isfield(g_strctParadigm.m_strctCurrentTrial,'m_iStimulusIndex') && ...
         g_strctParadigm.m_iMachineState ~= 6
     % Trial exist. Check state and draw either the image g_strctParadigm.m_strctCurrentTrial
     iMediaToDisplay = g_strctParadigm.m_strctCurrentTrial.m_iStimulusIndex;
-    % myz delete all the bugs!
-    %{
     switch g_strctParadigm.m_strctDesign.m_astrctMedia(iMediaToDisplay).m_strMediaType
         case 'Image'
-            fnDisplayMonocularImageLocally();
+            % fnDisplayMonocularImageLocally();
         case 'Movie'
             fnDisplayMonocularMovieLocally();
         case 'StereoImage'
@@ -44,7 +41,6 @@ if ~isempty(g_strctParadigm.m_strctCurrentTrial) && g_strctParadigm.m_bStimulusD
         otherwise
             assert(false);
     end
-    %}
 end
 
 %% Photodiode Crap
@@ -112,7 +108,6 @@ hTexturePointer = g_strctParadigm.m_strctDesign.m_astrctMedia(g_strctParadigm.m_
 aiTextureSize = g_strctParadigm.m_strctTexturesBuffer.m_a2iTextureSize(:,hTexturePointer)';
 aiStimulusRect = g_strctPTB.m_fScale * fnComputeStimulusRect(fStimulusSizePix, aiTextureSize, pt2fStimulusPos);
 
-
 if g_strctParadigm.m_bDisplayStimuliLocally
     if g_strctParadigm.m_strctCurrentTrial.m_bNoiseOverlay
         % Overlay image with nosie...will be slower (!)
@@ -131,11 +126,13 @@ if g_strctParadigm.m_bDisplayStimuliLocally
         
         hImageID = Screen('MakeTexture', g_strctPTB.m_hWindow,  a2fImage);
         Screen('DrawTexture', g_strctPTB.m_hWindow, hImageID,[],aiStimulusRect, fRotationAngle);
+
         Screen('Close',hImageID);
-        
+
     else
         % Default presentation mode of images...
         Screen('DrawTexture', g_strctPTB.m_hWindow, g_strctParadigm.m_strctTexturesBuffer.m_ahHandles(hTexturePointer),[],aiStimulusRect, fRotationAngle);
+
     end
     
     

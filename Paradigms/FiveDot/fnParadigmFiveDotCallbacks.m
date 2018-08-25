@@ -138,6 +138,20 @@ switch strCallback
             fnParadigmToStimulusServer('Display',pt2iCurrFixationSpot, iNewFixationSizePix,afBackgroundColor);
         end;
         
+    case 'DisparitySlider'
+        fNewDisparityMeters = round(get(g_strctParadigm.m_strctControllers.m_hDisparitySlider,'value'));
+        set(g_strctParadigm.m_strctControllers.m_hDisparityEdit,'String',num2str(fNewDisparityMeters));
+        g_strctParadigm.m_strctStimulusParams = fnTsSetVar(...
+            g_strctParadigm.m_strctStimulusParams,'DisparityMeters',fNewDisparityMeters);
+        fnLog('Setting fixation spot to %d pixels', fNewDisparityMeters);
+
+        pt2iCurrFixationSpot = g_strctParadigm.m_strctStimulusParams.FixationSpotPix.Buffer(:,:,g_strctParadigm.m_strctStimulusParams.FixationSpotPix.BufferIdx);
+        afBackgroundColor = ...
+            squeeze(g_strctParadigm.m_strctStimulusParams.BackgroundColor.Buffer(1,:,g_strctParadigm.m_strctStimulusParams.BackgroundColor.BufferIdx));
+        fnParadigmToStimulusServer('Display',pt2iCurrFixationSpot,...
+            g_strctParadigm.m_strctStimulusParams.FixationSizePix.Buffer(:,:,g_strctParadigm.m_strctStimulusParams.FixationSizePix.BufferIdx),...
+            afBackgroundColor,fNewDisparityMeters);
+        
 
     case 'StimulusONSlider'
         iStimulusONTime = round(get(g_strctParadigm.m_strctControllers.m_hStimulusONSlider,'value'));

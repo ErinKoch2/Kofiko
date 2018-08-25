@@ -19,7 +19,8 @@ switch g_strctParadigm.m_iMachineState
         else
             iNewStimulusIndex =  round(rand() * 4) + 1;
             iSpreadPix = g_strctParadigm.m_strctStimulusParams.SpreadPix.Buffer(g_strctParadigm.m_strctStimulusParams.SpreadPix.BufferIdx);
-            pt2iCenter = g_strctStimulusServer.m_aiScreenSize(3:4)/2;
+            %pt2iCenter = g_strctStimulusServer.m_aiScreenSize(3:4)/2;
+            pt2iCenter = [1080 540]/2;
             apt2iFixationSpots = [pt2iCenter;
                 pt2iCenter + [-iSpreadPix,-iSpreadPix];
                 pt2iCenter + [iSpreadPix,-iSpreadPix];
@@ -34,8 +35,10 @@ switch g_strctParadigm.m_iMachineState
         afBackgroundColor = ...
             squeeze(g_strctParadigm.m_strctStimulusParams.BackgroundColor.Buffer(1,:,g_strctParadigm.m_strctStimulusParams.BackgroundColor.BufferIdx));
         iFixationSpotRad = g_strctParadigm.m_strctStimulusParams.FixationSizePix.Buffer(g_strctParadigm.m_strctStimulusParams.FixationSizePix.BufferIdx);
+        fDisparity = g_strctParadigm.m_strctStimulusParams.DisparityMeters.Buffer(g_strctParadigm.m_strctStimulusParams.DisparityMeters.BufferIdx);
         
-        fnParadigmToStimulusServer('Display',pt2iNextFixationSpot, iFixationSpotRad,afBackgroundColor);
+        
+        fnParadigmToStimulusServer('Display',pt2iNextFixationSpot, iFixationSpotRad,afBackgroundColor,fDisparity);
         
         fnDAQWrapper('StrobeWord', 1);
         fnParadigmToKofikoComm('SetParadigmState','Running...');

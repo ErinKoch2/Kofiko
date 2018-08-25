@@ -24,6 +24,10 @@ strctStimulusParams.m_fSpreadPix = ...
 strctStimulusParams.m_fGazeBoxPix = ...
     g_strctParadigm.m_strctStimulusParams.GazeBoxPix.Buffer(1,:,g_strctParadigm.m_strctStimulusParams.GazeBoxPix.BufferIdx);
 
+strctStimulusParams.m_fDisparity = ...
+    g_strctParadigm.m_strctStimulusParams.Disparity.Buffer(g_strctParadigm.m_strctStimulusParams.Disparity.BufferIdx);
+
+
 strctStimulusParams.m_bShowEyeTraces = g_strctParadigm.m_strctStimulusParams.m_bShowEyeTraces;
 strctStimulusParams.m_apt2fPreviousFixations = g_strctParadigm.m_strctStimulusParams.m_apt2fPreviousFixations;
 strctStimulusParams.m_iPrevFixationIndex = g_strctParadigm.m_strctStimulusParams.m_iPrevFixationIndex;

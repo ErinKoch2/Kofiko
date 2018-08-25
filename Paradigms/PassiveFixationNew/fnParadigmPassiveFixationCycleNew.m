@@ -58,23 +58,33 @@ switch g_strctParadigm.m_iMachineState
     case 0
         fnParadigmToKofikoComm('SetParadigmState','Waiting for user to press Start');
     case 1 % Run some tests that everything is OK. Then goto 2
-        fnParadigmToKofikoComm('unityHideGrating');
         if g_strctParadigm.m_iNumStimuli > 0
             g_strctParadigm.m_iMachineState = 2;
         else
             fnParadigmToKofikoComm('SetParadigmState','Cannot start machine. Please load an image list.');
         end;
     case 2
-         % this seems to be the MEATUS!
+        if isempty(g_strctParadigm.m_strctDesign)
+            g_strctParadigm.m_iMachineState = 1;
+            return;
+        end;
+        % Set Next "trial" (image on->off)
+         if g_strctParadigm.m_bRepeatNonFixatedImages && ~g_strctParadigm.m_bJustLoaded && ...
+                 ~isempty(g_strctParadigm.m_strctCurrentTrial) && isfield(g_strctParadigm.m_strctCurrentTrial,'m_bMonkeyFixated') &&  ~g_strctParadigm.m_strctCurrentTrial.m_bMonkeyFixated
+             % Keep same trial....
+         else
+             % This is the important call to set up all the different
+             % parameters for the next trial (media, position, etc...)
+            g_strctParadigm.m_strctCurrentTrial = fnPassiveFixationPrepareTrial();
+         end
+         
          if g_strctParadigm.m_bJustLoaded
              g_strctParadigm.m_bJustLoaded = false;
          end;
          
         g_strctParadigm.m_strctCurrentTrial.m_bMonkeyFixated = true;
-        g_strctParadigm.m_bStimulusDisplayed = true;
-
-
         
+        g_strctParadigm.m_bStimulusDisplayed = true;
         
        
         fnParadigmToStatServerComm('Send','TrialStart');
@@ -85,27 +95,46 @@ switch g_strctParadigm.m_iMachineState
         % Very important
         % This will tell the statistics server which trial type is
         % starting by sending a strobe word to plexon....
-        g_strctParadigm.m_strctCurrentTrial.m_iStimulusIndex = 1;
-        fnParadigmToKofikoComm('TrialStart',g_strctParadigm.m_strctCurrentTrial.m_iStimulusIndex);  
+         
+            fnParadigmToKofikoComm('TrialStart',g_strctParadigm.m_strctCurrentTrial.m_iStimulusIndex);  
         
         % Instruct the stimulus server to display the trial....
-        % IMPORTANTE!!! MYZ
-        r = rand(4,1);
-        fnParadigmToKofikoComm('unityShowGrating',r(1),r(2),r(3),r(4));
-        g_strctParadigm.m_strctCurrentTrial.m_trial_Orientations = r;
-                    
         fnParadigmToStimulusServer('ShowTrial',g_strctParadigm.m_strctCurrentTrial);
         g_strctParadigm.m_strctCurrentTrial.m_fSentMessageTimer = GetSecs();
-        g_strctParadigm.m_strctCurrentTrial.m_fImageFlipON_TS_Kofiko = GetSecs();
         
         % Update status line
-        g_strctParadigm.m_iTrialLength_MS = g_strctParadigm.m_fInitial_StimulusON_MS+g_strctParadigm.m_fInitial_StimulusOFF_MS;
+        if strcmpi(g_strctParadigm.m_strctCurrentTrial.m_strctMedia.m_strMediaType,'Movie') || strcmpi(g_strctParadigm.m_strctCurrentTrial.m_strctMedia.m_strMediaType,'StereoMovie')             
+             hTexturePointer = g_strctParadigm.m_strctCurrentTrial.m_strctMedia.m_aiMediaToHandleIndexInBuffer(1);
+              g_strctParadigm.m_iTrialLength_MS = 1e3*g_strctParadigm.m_strctTexturesBuffer.m_afMovieLengthSec(hTexturePointer);
+        else
+            g_strctParadigm.m_iTrialLength_MS = g_strctParadigm.m_strctCurrentTrial.m_fStimulusON_MS+g_strctParadigm.m_strctCurrentTrial.m_fStimulusOFF_MS;
+        end
+          
+        iSelectedBlock = g_strctParadigm.m_strctDesign.m_strctBlocksAndOrder.m_astrctBlockOrder(g_strctParadigm.m_iCurrentOrder).m_aiBlockIndexOrder(g_strctParadigm.m_iCurrentBlockIndexInOrderList);
+        iNumMediaInBlock = length(g_strctParadigm.m_strctDesign.m_strctBlocksAndOrder.m_astrctBlocks(iSelectedBlock).m_aiMedia);
 
-        %{
+        strBlockName =  g_strctParadigm.m_strctDesign.m_strctBlocksAndOrder.m_astrctBlocks(iSelectedBlock).m_strBlockName;
+        iNumBlocks = length(g_strctParadigm.m_strctDesign.m_strctBlocksAndOrder.m_astrctBlockOrder(g_strctParadigm.m_iCurrentOrder).m_aiBlockIndexOrder);
+        iNumTimesToShowBlock = g_strctParadigm.m_strctDesign.m_strctBlocksAndOrder.m_astrctBlockOrder(g_strctParadigm.m_iCurrentOrder).m_aiBlockRepitition(g_strctParadigm.m_iCurrentBlockIndexInOrderList);
+        
        if g_strctParadigm.m_bParameterSweep
            totalBlockTimeSec = sum(sum(g_strctParadigm.m_a2fParamSpace(:,6:7)))/1000;
            spentBlockTimeSec = sum(sum(g_strctParadigm.m_a2fParamSpace(1:g_strctParadigm.m_strctParamSweep.m_iParamSweepIndex,6:7)))/1000;
-        fnParadigmToKofikoComm('SetParadigmState', sprintf('Block %d/%d (%s), Block Rep %d/%d, Image %d (%d/%d), Block Time: (%.1f / %.1f) Sec', ...
+        
+           fnParadigmToKofikoComm('SetParadigmState', sprintf('Rot%.2f,%.2f,Tra%.2f,%.2f, Block Rep %d/%d, Image (%d/%d), Block Time: (%.1f / %.1f) Sec', ...
+            g_strctParadigm.m_strctCurrentTrial.m_fRotationX,...
+            g_strctParadigm.m_strctCurrentTrial.m_fRotationY,...
+            g_strctParadigm.m_strctCurrentTrial.m_fTranslationX,...
+            g_strctParadigm.m_strctCurrentTrial.m_fTranslationY,...
+            g_strctParadigm.m_iNumTimesBlockShown,...
+            iNumTimesToShowBlock,...
+            g_strctParadigm.m_strctParamSweep.m_iParamSweepIndex,...
+            size(g_strctParadigm.m_a2fParamSpace,1),...
+              spentBlockTimeSec,...
+            totalBlockTimeSec));
+        
+        %{
+           fnParadigmToKofikoComm('SetParadigmState', sprintf('Block %d/%d (%s), Block Rep %d/%d, Image %d (%d/%d), Block Time: (%.1f / %.1f) Sec', ...
             g_strctParadigm.m_iCurrentBlockIndexInOrderList,...
             iNumBlocks,...
             strBlockName,...
@@ -116,8 +145,23 @@ switch g_strctParadigm.m_iMachineState
             size(g_strctParadigm.m_a2fParamSpace,1),...
               spentBlockTimeSec,...
             totalBlockTimeSec));
-                  
+          
+       %}
+        
        else
+                   
+           fnParadigmToKofikoComm('SetParadigmState', sprintf('Rot%.2f,%.2f,Tra%.2f,%.2f, Block Rep %d/%d, Image (%d/%d), Block Time: (%.1f / %.1f) Sec', ...
+            g_strctParadigm.m_strctCurrentTrial.m_fRotationX,...
+            g_strctParadigm.m_strctCurrentTrial.m_fRotationY,...
+            g_strctParadigm.m_strctCurrentTrial.m_fTranslationX,...
+            g_strctParadigm.m_strctCurrentTrial.m_fTranslationY,...
+            g_strctParadigm.m_iNumTimesBlockShown,...
+            iNumTimesToShowBlock,...
+            g_strctParadigm.m_strctParamSweep.m_iParamSweepIndex,...
+                 iNumMediaInBlock,...
+              (iNumMediaInBlock-g_strctParadigm.m_iCurrentMediaIndexInBlockList) * (g_strctParadigm.m_iTrialLength_MS)/1e3,...
+            iNumMediaInBlock* (g_strctParadigm.m_iTrialLength_MS)/1e3 ));
+           %{
         fnParadigmToKofikoComm('SetParadigmState', sprintf('Block %d/%d (%s), Block Rep %d/%d, Image %d (%d/%d), Block Time: (%.1f / %.1f) Sec', ...
             g_strctParadigm.m_iCurrentBlockIndexInOrderList,...
             iNumBlocks,...
@@ -129,27 +173,10 @@ switch g_strctParadigm.m_iMachineState
             iNumMediaInBlock,...
               (iNumMediaInBlock-g_strctParadigm.m_iCurrentMediaIndexInBlockList) * (g_strctParadigm.m_iTrialLength_MS)/1e3,...
             iNumMediaInBlock* (g_strctParadigm.m_iTrialLength_MS)/1e3 ));
+           %}
        end
-        %}
         g_strctParadigm.m_iMachineState = 3;
     case 3
-        if fCurrTime-g_strctParadigm.m_strctCurrentTrial.m_fImageFlipON_TS_Kofiko > (g_strctParadigm.m_fInitial_StimulusON_MS/1e3)
-            fnParadigmToKofikoComm('DisplayMessage','Finished displaying!');       
-            fnParadigmToKofikoComm('unityHideGrating');
-            
-            g_strctParadigm.m_strctCurrentTrial.m_fImageFlipOFF_TS_Kofiko = GetSecs();
-            g_strctParadigm.m_iMachineState = 4;
-        end
-        
-        return;
-        
-        
-        % MYZ: we'll ignore any feedback from unity at the moment. 
-        %edits: 
-        % Now, it depends if we switch stimulus off or not.
-        g_strctParadigm.m_strctCurrentTrial.m_fImageFlipON_TS_Kofiko = GetSecs();
-        g_strctParadigm.m_iMachineState = 5;
-        
         % Wait for message that trial started (i.e., image was displayed on
         % screen)
         if ~isempty(strctInputs.m_acInputFromStimulusServer) 
@@ -179,12 +206,6 @@ switch g_strctParadigm.m_iMachineState
                 end
                 
             end
-        
-
-                
-        %ignoreTHIS! -myz ; flipON stim server magic that we are not going
-        %to worry about right now
-        %{
         else
             % Message back should have arrive within 1 refresh rate
             % interval. We use 1 second, just to be sure.
@@ -201,48 +222,10 @@ switch g_strctParadigm.m_iMachineState
                     
                 
             end
-        %}
-        
+            
         end
 
     case 4
-        if fCurrTime-g_strctParadigm.m_strctCurrentTrial.m_fImageFlipOFF_TS_Kofiko > (g_strctParadigm.m_fInitial_StimulusOFF_MS/1e3)
-            fnParadigmToKofikoComm('DisplayMessage','finished waiting!');
-            
-            fnParadigmToKofikoComm('TrialEnd', g_strctParadigm.m_strctCurrentTrial.m_bMonkeyFixated);
-            
-%    
-%             fnDAQWrapper('StrobeWord', g_strctParadigm.m_strctStatServerDesign.TrialOutcomesCodes(3));
-%             
-
-            if g_strctParadigm.m_strctCurrentTrial.m_bMonkeyFixated
-                fnParadigmToStatServerComm('Send',['TrialOutcome ',num2str(g_strctParadigm.m_strctStatServerDesign.TrialOutcomesCodes(3))]);
-                fnDAQWrapper('StrobeWord', g_strctParadigm.m_strctStatServerDesign.TrialOutcomesCodes(3));    
-            else
-                fnParadigmToStatServerComm('Send',['TrialOutcome ',num2str(g_strctParadigm.m_strctStatServerDesign.TrialOutcomesCodes(2))]);
-                fnDAQWrapper('StrobeWord', g_strctParadigm.m_strctStatServerDesign.TrialOutcomesCodes(2));
-            end
-           fnParadigmToStatServerComm('Send','TrialEnd');
-            fnDAQWrapper('StrobeWord', g_strctParadigm.m_strctStatServerDesign.TrialEndCode);            
-            
-            
-                    
-            aiTrialStoreInfo = [g_strctParadigm.m_strctCurrentTrial.m_trial_Orientations(1),...
-                        g_strctParadigm.m_strctCurrentTrial.m_trial_Orientations(2),...
-                        g_strctParadigm.m_strctCurrentTrial.m_trial_Orientations(3),...
-                        g_strctParadigm.m_strctCurrentTrial.m_trial_Orientations(4),...
-                        g_strctParadigm.m_strctCurrentTrial.m_fImageFlipON_TS_Kofiko,... 
-                        g_strctParadigm.m_strctCurrentTrial.m_fImageFlipOFF_TS_Kofiko,... 
-                        g_strctParadigm.m_fInitial_StimulusON_MS,...
-                        g_strctParadigm.m_fInitial_StimulusOFF_MS]';
-
-                fnTsSetVarParadigm('Trials',aiTrialStoreInfo);
-
-            g_strctParadigm.m_iMachineState = 2;
-        end
-        
-        return;
-        
         % Trial started. Now we wait for the FlipOFF signal
         if ~isempty(strctInputs.m_acInputFromStimulusServer) 
             if strcmpi(strctInputs.m_acInputFromStimulusServer{1},'FlipOFF')
@@ -304,8 +287,12 @@ switch g_strctParadigm.m_iMachineState
                                 g_strctParadigm.m_strctCurrentTrial.m_fImageFlipON_TS_Kofiko,...
                                 iNumFramesDisplayed,...
                                 g_strctParadigm.m_strctCurrentTrial.m_iNoiseIndex,...
-                                g_strctParadigm.m_fInitial_StimulusON_MS,...
-                                g_strctParadigm.m_fInitial_StimulusOFF_MS];
+                                g_strctParadigm.m_strctCurrentTrial.m_fStimulusON_MS,...
+                                g_strctParadigm.m_strctCurrentTrial.m_fStimulusOFF_MS,...
+                                g_strctParadigm.m_strctCurrentTrial.m_fRotationX,...
+                                g_strctParadigm.m_strctCurrentTrial.m_fRotationY,...
+                                g_strctParadigm.m_strctCurrentTrial.m_fTranslationX,...
+                                g_strctParadigm.m_strctCurrentTrial.m_fTranslationY]';
              
             fnTsSetVarParadigm('Trials',aiTrialStoreInfo);
              g_strctParadigm.m_iMachineState = 2;
@@ -389,7 +376,6 @@ switch g_strctParadigm.m_strctDynamicJuice.m_iState
 
     case 2
         % Monkey was fixating last iteration
-        % JUICE for good behaviour!
         if bFixating
             % Good. How long did it pass since the last fixation ?
             g_strctParadigm.m_strctDynamicJuice.m_fTotalFixationTime = g_strctParadigm.m_strctDynamicJuice.m_fTotalFixationTime + (fCurrTime-g_strctParadigm.m_strctDynamicJuice.m_fLastKnownFixationTime);
@@ -399,7 +385,7 @@ switch g_strctParadigm.m_strctDynamicJuice.m_iState
                 g_strctParadigm.m_strctDynamicJuice.m_fTotalNonFixationTime = 0;
                 g_strctParadigm.m_strctDynamicJuice.m_fTotalFixationTime = 0;
                 % Give Juice!
-                % fnParadigmToKofikoComm('DisplayMessage', sprintf('Juice Time = %.2f ,Gaze Time = %.1f',fJuiceTimeMS,fGazeTimeSec*1e3 ) );
+%                fnParadigmToKofikoComm('DisplayMessage', sprintf('Juice Time = %.2f ,Gaze Time = %.1f',fJuiceTimeMS,fGazeTimeSec*1e3 ) );
                 fnParadigmToKofikoComm('Juice',fJuiceTimeMS );
                 if g_strctParadigm.m_strctDynamicJuice.m_iFixationCounter < fMaxFixations
                     g_strctParadigm.m_strctDynamicJuice.m_iFixationCounter = g_strctParadigm.m_strctDynamicJuice.m_iFixationCounter + 1;

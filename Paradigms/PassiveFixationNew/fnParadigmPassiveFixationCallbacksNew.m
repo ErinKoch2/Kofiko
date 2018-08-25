@@ -23,46 +23,13 @@ switch strCallback
         fnParadigmToKofikoComm('DisplayMessage', 'Stopping Sweeps');
         fnNanoStimulatorStopStimulation();
         g_strctParadigm.m_strctNanoStimulator.m_iMachineState = 0;
-        
-        if isfield(g_strctParadigm.m_strctNanoStimulator,'m_astrctSavedParams')
-            strctParams.m_astrctChannels = g_strctParadigm.m_strctNanoStimulator.m_astrctSavedParams;
-            for k=1:length(g_strctParadigm.m_strctNanoStimulator.m_astrctSavedParams)
-                bOK = fnSetStimulationTrain(k, strctParams);
-            end
-        end
-                
-        
-        
     case 'BlockLoopingToggle'
         g_strctParadigm.m_bBlockLooping = get(g_strctParadigm.m_strctControllers.m_hLoopCurrentBlock,'value') > 0;
     case 'BlocksDoneAction'
         acOptions =get(g_strctParadigm.m_strctControllers.m_hBlocksDoneActionPopup,'String');
         iValue =get(g_strctParadigm.m_strctControllers.m_hBlocksDoneActionPopup,'value');
         g_strctParadigm.m_strBlockDoneAction = acOptions{iValue};
-    case 'ChangeBlockOrder'
-        if isempty(g_strctParadigm.m_strctDesign)
-            return;
-        end;
-        
-        g_strctParadigm.m_iNumTimesBlockShown = 0;
-        g_strctParadigm.m_iCurrentBlockIndexInOrderList = 1;
-        g_strctParadigm.m_iCurrentMediaIndexInBlockList = 1;
-        g_strctParadigm.m_iCurrentOrder = get(g_strctParadigm.m_strctControllers.m_hBlockOrderPopup,'value');
-        
-        
-        acBlockNames = {g_strctParadigm.m_strctDesign.m_strctBlocksAndOrder.m_astrctBlocks.m_strBlockName};
-        acBlockNamesForThisOrder = acBlockNames(g_strctParadigm.m_strctDesign.m_strctBlocksAndOrder.m_astrctBlockOrder(g_strctParadigm.m_iCurrentOrder).m_aiBlockIndexOrder);
-        set(g_strctParadigm.m_strctControllers.m_hBlockLists,'String',acBlockNamesForThisOrder,'value',1);
-        
-        
-        iSelectedBlock = g_strctParadigm.m_strctDesign.m_strctBlocksAndOrder.m_astrctBlockOrder(g_strctParadigm.m_iCurrentOrder).m_aiBlockIndexOrder(g_strctParadigm.m_iCurrentBlockIndexInOrderList);
-        iNumMediaInBlock = length(g_strctParadigm.m_strctDesign.m_strctBlocksAndOrder.m_astrctBlocks(iSelectedBlock).m_aiMedia);
-        if g_strctParadigm.m_bRandom
-            [fDummy,g_strctParadigm.m_aiCurrentRandIndices] = sort(rand(1,iNumMediaInBlock));
-        else
-            g_strctParadigm.m_aiCurrentRandIndices = 1:iNumMediaInBlock;
-        end   
-        
+         
     case 'JumpToBlock'
         if isempty(g_strctParadigm.m_strctDesign)
             return;
@@ -450,6 +417,7 @@ if strFile(1) ~= 0
     g_strctParadigm.m_strNextImageList = [strPath,strFile];
     
     if ~fnLoadPassiveFixationDesign(g_strctParadigm.m_strNextImageList);
+        disp('Something Wrong');
         return;
     end;
     

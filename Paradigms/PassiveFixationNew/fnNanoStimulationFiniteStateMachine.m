@@ -18,10 +18,6 @@ switch g_strctParadigm.m_strctNanoStimulator.m_iMachineState
             % Start stimulation protocol (varying frequencies)
             g_strctParadigm.m_strctNanoStimulator.m_iFrequencySweepIter = 1;
             g_strctParadigm.m_strctNanoStimulator.m_iMachineState  = 2;
-            
-            % Save current set of parameters
-            g_strctParadigm.m_strctNanoStimulator.m_astrctSavedParams = fnReadParametersFromStimulator(g_hNanoStimulatorPort);
-            
         else
             % Error message.
             fnParadigmToKofikoComm('DisplayMessage', 'Open NanoStimGUI First!');
@@ -34,7 +30,7 @@ switch g_strctParadigm.m_strctNanoStimulator.m_iMachineState
         InterTrainTimeSec= fnTsGetVar(g_strctParadigm,'NanoStimulatorInterTrainInterval');
         
         fnParadigmToKofikoComm('DisplayMessage', sprintf('Sweep %d Hz',afFrequencySweep(g_strctParadigm.m_strctNanoStimulator.m_iFrequencySweepIter)));
-        afStndardAntidromic = [afFrequencySweep(g_strctParadigm.m_strctNanoStimulator.m_iFrequencySweepIter),        150,        1000000,       1/InterTrainTimeSec,      iNumRepeats,      true,       100,        150,        250,      1,      true,150,600,0];
+        afStndardAntidromic = [afFrequencySweep(g_strctParadigm.m_strctNanoStimulator.m_iFrequencySweepIter),        150,        1000000,       1/InterTrainTimeSec,      iNumRepeats,      true,       100,        150,        0,      1,      true];
         strctParams=fnStimulationParamsArrayToStruct(iChannel,afStndardAntidromic);
         bOK = fnSetStimulationTrain(iChannel, strctParams);
         Res=IOPort('Write',  g_hNanoStimulatorPort , uint8([sprintf('%02d %d',SOFT_TRIGGER,iChannel-1),10]));
@@ -52,11 +48,6 @@ switch g_strctParadigm.m_strctNanoStimulator.m_iMachineState
                 g_strctParadigm.m_strctNanoStimulator.m_iMachineState  = 0;
                 fnParadigmToKofikoComm('DisplayMessage', 'Sweep Finished');
                 
-                strctParams.m_astrctChannels = g_strctParadigm.m_strctNanoStimulator.m_astrctSavedParams;
-                for k=1:length(g_strctParadigm.m_strctNanoStimulator.m_astrctSavedParams)
-                    bOK = fnSetStimulationTrain(k, strctParams);
-                end
-                      
             else
                 % Still working
                 g_strctParadigm.m_strctNanoStimulator.m_iMachineState  = 2;
@@ -76,10 +67,6 @@ switch g_strctParadigm.m_strctNanoStimulator.m_iMachineState
             % Start stimulation protocol (varying frequencies)
             g_strctParadigm.m_strctNanoStimulator.m_iDelaySweepIter = 1;
             g_strctParadigm.m_strctNanoStimulator.m_iMachineState  = 11;
-            
-            % Save current set of parameters
-            g_strctParadigm.m_strctNanoStimulator.m_astrctSavedParams = fnReadParametersFromStimulator(g_hNanoStimulatorPort);
-             
         else
             % Error message.
             fnParadigmToKofikoComm('DisplayMessage', 'Open NanoStimGUI First!');
@@ -89,7 +76,7 @@ switch g_strctParadigm.m_strctNanoStimulator.m_iMachineState
         
         InterTrainTimeSec= fnTsGetVar(g_strctParadigm,'NanoStimulatorInterTrainInterval');
         
-        afStndardAntidromic = [1,        150,        25*1000,       1,      1,      true,       100,        150,        afTriggerDelayMs(g_strctParadigm.m_strctNanoStimulator.m_iDelaySweepIter)*1000+250,      1,      true,afTriggerDelayMs(g_strctParadigm.m_strctNanoStimulator.m_iDelaySweepIter)*1000+150,600,0];
+        afStndardAntidromic = [1,        150,        1000000,       1/InterTrainTimeSec,      1,      true,       100,        150,        afTriggerDelayMs(g_strctParadigm.m_strctNanoStimulator.m_iDelaySweepIter)*1000,      1,      true];
         strctParams=fnStimulationParamsArrayToStruct(iChannel,afStndardAntidromic);
         bOK = fnSetStimulationTrain(iChannel, strctParams);
         g_strctParadigm.m_strctNanoStimulator.m_aiTriggersBefore = fnGetNanoStimulatorTriggerCount();
@@ -110,12 +97,6 @@ switch g_strctParadigm.m_strctNanoStimulator.m_iMachineState
                 if g_strctParadigm.m_strctNanoStimulator.m_iDelaySweepIter > length(afTriggerDelayMs)
                     g_strctParadigm.m_strctNanoStimulator.m_iMachineState  = 0;
                     fnParadigmToKofikoComm('DisplayMessage', 'Sweep Finished');
-                    
-                    strctParams.m_astrctChannels = g_strctParadigm.m_strctNanoStimulator.m_astrctSavedParams;
-                    for k=1:length(g_strctParadigm.m_strctNanoStimulator.m_astrctSavedParams)
-                        bOK = fnSetStimulationTrain(k, strctParams);
-                       end
-                            
                 else
                     g_strctParadigm.m_strctNanoStimulator.m_iMachineState  = 11;
                 end
@@ -129,10 +110,6 @@ switch g_strctParadigm.m_strctNanoStimulator.m_iMachineState
             % Start stimulation protocol (varying frequencies)
             g_strctParadigm.m_strctNanoStimulator.m_iFrequencySweepIter = 1;
             g_strctParadigm.m_strctNanoStimulator.m_iMachineState  = 21;
-            
-            % Save current set of parameters
-            g_strctParadigm.m_strctNanoStimulator.m_astrctSavedParams = fnReadParametersFromStimulator(g_hNanoStimulatorPort);
-              
         else
             % Error message.
             fnParadigmToKofikoComm('DisplayMessage', 'Open NanoStimGUI First!');
@@ -148,7 +125,7 @@ switch g_strctParadigm.m_strctNanoStimulator.m_iMachineState
         InterTrainTimeSec= fnTsGetVar(g_strctParadigm,'NanoStimulatorInterTrainInterval');
         
         fnParadigmToKofikoComm('DisplayMessage', sprintf('Sweep %d Hz',afFrequencySweep(g_strctParadigm.m_strctNanoStimulator.m_iFrequencySweepIter)));
-        afStndardOptogenetics = [afFrequencySweep(g_strctParadigm.m_strctNanoStimulator.m_iFrequencySweepIter),        5000,        1000000,       1/InterTrainTimeSec,      iNumRepeats,      false,       0,        0,        0,      1,      true,0,0,0];
+        afStndardOptogenetics = [afFrequencySweep(g_strctParadigm.m_strctNanoStimulator.m_iFrequencySweepIter),        5000,        1000000,       1/InterTrainTimeSec,      iNumRepeats,      false,       0,        0,        0,      1,      true];
         strctParams=fnStimulationParamsArrayToStruct(iChannel,afStndardOptogenetics);
         bOK = fnSetStimulationTrain(iChannel, strctParams);
         Res=IOPort('Write',  g_hNanoStimulatorPort , uint8([sprintf('%02d %d',SOFT_TRIGGER,iChannel-1),10]));
@@ -184,7 +161,7 @@ switch g_strctParadigm.m_strctNanoStimulator.m_iMachineState
         InterTrainTimeSec= fnTsGetVar(g_strctParadigm,'NanoStimulatorInterTrainInterval');
    
              iChannel=2;
-        afStndardOptogenetics = [1,        500000,        1000000,       1/InterTrainTimeSec,      iNumRepeats,      false,       0,        0,        0,      1,      true,0,0,0];
+        afStndardOptogenetics = [1,        500000,        1000000,       1/InterTrainTimeSec,      iNumRepeats,      false,       0,        0,        0,      1,      true];
         strctParams=fnStimulationParamsArrayToStruct(iChannel,afStndardOptogenetics);
         bOK = fnSetStimulationTrain(iChannel, strctParams);
         Res=IOPort('Write',  g_hNanoStimulatorPort , uint8([sprintf('%02d %d',SOFT_TRIGGER,iChannel-1),10]));
@@ -210,7 +187,7 @@ switch g_strctParadigm.m_strctNanoStimulator.m_iMachineState
         InterTrainTimeSec= fnTsGetVar(g_strctParadigm,'NanoStimulatorInterTrainInterval');
         
         fnParadigmToKofikoComm('DisplayMessage', sprintf('Sweep %d Hz',afFrequencySweep(g_strctParadigm.m_strctNanoStimulator.m_iFrequencySweepIter)));
-        afStndardOptogenetics = [afFrequencySweep(g_strctParadigm.m_strctNanoStimulator.m_iFrequencySweepIter),        1000,        1000000,       1/InterTrainTimeSec,      iNumRepeats,      false,       0,        0,        0,      1,      true,0,0,0];
+        afStndardOptogenetics = [afFrequencySweep(g_strctParadigm.m_strctNanoStimulator.m_iFrequencySweepIter),        1000,        1000000,       1/InterTrainTimeSec,      iNumRepeats,      false,       0,        0,        0,      1,      true];
         strctParams=fnStimulationParamsArrayToStruct(iChannel,afStndardOptogenetics);
         bOK = fnSetStimulationTrain(iChannel, strctParams);
         Res=IOPort('Write',  g_hNanoStimulatorPort , uint8([sprintf('%02d %d',SOFT_TRIGGER,iChannel-1),10]));
@@ -244,10 +221,6 @@ switch g_strctParadigm.m_strctNanoStimulator.m_iMachineState
     case 27
         g_strctParadigm.m_strctNanoStimulator.m_iMachineState  = 0;
         fnParadigmToKofikoComm('DisplayMessage', 'Sweep Finished');
-        strctParams.m_astrctChannels = g_strctParadigm.m_strctNanoStimulator.m_astrctSavedParams;
-        for k=1:length(g_strctParadigm.m_strctNanoStimulator.m_astrctSavedParams)
-            bOK = fnSetStimulationTrain(k, strctParams);
-        end
         
         
 end
