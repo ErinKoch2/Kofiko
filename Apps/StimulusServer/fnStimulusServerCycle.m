@@ -162,14 +162,20 @@ else
         
 %         try
             g_strctPTB.m_aiRect=Screen('Rect', g_strctConfig.m_strctStimulusServer.m_fPTBScreen);
+            
+            
+             
             try
-                g_strctPTB.m_hWindow=Screen('OpenWindow',g_strctConfig.m_strctStimulusServer.m_fPTBScreen, 0,[],32,2, 0);
+                % insted of THIS 3 times ... 
+                % g_strctPTB.m_hWindow=Screen('OpenWindow',g_strctConfig.m_strctStimulusServer.m_fPTBScreen, 0,[],32,2, 0);
+                g_strctPTB.m_hWindow=Screen('OpenWindow',g_strctConfig.m_strctStimulusServer.m_fPTBScreen, [0 0 0],[0 0 1080 540]);
+                %g_strctPTB.m_hWindow=Screen('OpenWindow',g_strctConfig.m_strctStimulusServer.m_fPTBScreen, [0 0 0],[0 0 720 360]); %,32,2, 0);
             catch
-                try
-                    g_strctPTB.m_hWindow=Screen('OpenWindow',g_strctConfig.m_strctStimulusServer.m_fPTBScreen, 0,[],32,2, 0);
-                catch
-                    g_strctPTB.m_hWindow=Screen('OpenWindow',g_strctConfig.m_strctStimulusServer.m_fPTBScreen, 0,[],32,2, 0);
-                end
+                %try
+                %    g_strctPTB.m_hWindow=Screen('OpenWindow',g_strctConfig.m_strctStimulusServer.m_fPTBScreen, [0 0 0],[0 720 0 360],32,2, 0);
+                %catch
+                %    g_strctPTB.m_hWindow=Screen('OpenWindow',g_strctConfig.m_strctStimulusServer.m_fPTBScreen, [0 0 0],[0 720 0 360],32,2, 0);
+                %end
             end
             
             
